@@ -1,0 +1,19 @@
+{
+  "name": "mymentor",
+  "version": "1.0.0",
+  "description": "Web application for MyMentor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bandalas/MyMentor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bandalas/MyMentor/issues"
+  },
+  "homepage": "https://github.com/bandalas/MyMentor#readme"
+}
