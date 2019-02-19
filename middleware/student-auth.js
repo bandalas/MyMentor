@@ -9,10 +9,10 @@ function auth(req, res, next) {
     if(!token) denyAccess(res);
     try {
         const decoded = jwt.verify(token, 'jwtPrivateKey');
-        if(decoded.type !== 'Tutor')
+        if(decoded.type !== 'Student')
             denyAccess(res);
 
-        req.tutor = decoded;
+        req.student = decoded;
         next();        
     } catch(e) {
         res.status(400).send('Invalid token');

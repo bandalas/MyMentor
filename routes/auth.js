@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const Tutor = require('./../model/tutor');
+const User = require('./../model/user');
 const { validateAuthentication } = require('./../core/validators/tutor-validator');
 const { unhashPassword } = require('./../core/password-hasher');
 
@@ -14,16 +14,16 @@ router.post('/', (req, res) => {
         const error_invalid_msg = 'Invalid email or password';
 
         // Checks if the tutor exists
-        Tutor.findOne({ email: req.body.email})
-         .then((tutor)=> {
+        User.findOne({ email: req.body.email})
+         .then((user)=> {
              // Checks if hashed password of the record matches input
-             unhashPassword(req.body.password, tutor.password)
+             unhashPassword(req.body.password, user.password)
                 // Returns boolean of whether if the password was valid or not
               .then((validPassword) => {
                   if(!validPassword) return res.status(400).send(error_invalid_msg);
 
                   // Password matches, thus authentication should be performed
-                  const token = tutor.generateTutorToken();
+                  const token = user.generateToken();
                   res.send(token);
               });
          })

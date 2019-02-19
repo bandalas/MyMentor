@@ -11,8 +11,8 @@ var userSchema = new mongoose.Schema({
     semester: { type: Number, required: true }
 }, options);
 
-userSchema.methods.generateTutorToken = function() {
-    const token = jwt.sign({ _id: this._id, name: this.firstName }, 'jwtPrivateKey');
+userSchema.methods.generateToken = function() {
+    const token = jwt.sign({ _id: this._id, name: this.firstName, type: this.usertype}, 'jwtPrivateKey');
     return token;
 }
 

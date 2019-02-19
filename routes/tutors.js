@@ -1,5 +1,4 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 const auth = require('../middleware/tutor-auth');
@@ -40,7 +39,7 @@ router.post('/signup', (req, res) => {
             tutor.save()
              .then(tutor => {
                 console.log(tutor);
-                const token = tutor.generateTutorToken();
+                const token = tutor.generateToken();
                 res.header('x-auth-token',token).send(tutor);
             })
              .catch(error => res.status(404).send(error.message));
@@ -59,15 +58,14 @@ router.get('/dashboard', auth, (req, res) => {
 
 router.get('/classes', auth, (req, res) => {
     const classes = Class.find({ tutor: req.tutor._id }).exec(function(err, classes) {
-        try {
-            let arrClasses = classes.map(c => c.toObject());
-            console.log(arrClasses);
-            res.json(arrClasses);
-        }
-        catch(err) {
+        if(!classes.length) {
             console.log([]);
             res.json([]);
         }
+
+        let arrClasses = classes.map(c => c.toObject());
+        console.log(arrClasses);
+        res.json(arrClasses);
     });
 });
 

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 const tutors = require('./routes/tutors');
+const students = require('./routes/students');
 const auth = require('./routes/auth');
 
 // Setting up db connection
@@ -14,6 +15,7 @@ mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
 // Setting routes
 app.use(bodyParser.json());
 app.use('/tutors/', tutors);
+app.use('/students/', students);
 app.use('/auth/', auth);
 
 const port = process.env.PORT || 3000;
