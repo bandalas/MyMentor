@@ -1,4 +1,4 @@
-const Joi = require('Joi');
+const Joi = require('joi');
 
 //  General schema and function required for post request
 const postSchema = {
