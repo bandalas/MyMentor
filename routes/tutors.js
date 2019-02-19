@@ -4,6 +4,7 @@ const router = express.Router();
 
 const auth = require('../middleware/tutor-auth');
 const Tutor = require('./../model/tutor');
+const Class = require('./../model/class');
 const { postValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
@@ -54,6 +55,66 @@ router.post('/signup', (req, res) => {
 router.get('/dashboard', auth, (req, res) => {
     res.send('Welcome ' + req.tutor.name +' ! id: '+ req.tutor._id);
 
+});
+
+router.get('/classes', auth, (req, res) => {
+    const classes = Class.find({ tutor: req.tutor._id }).exec(function(err, classes) {
+        try {
+            let arrClasses = classes.map(c => c.toObject());
+            console.log(arrClasses);
+            res.json(arrClasses);
+        }
+        catch(err) {
+            console.log([]);
+            res.json([]);
+        }
+    });
+});
+
+router.post('/class', auth, (req, res) => {
+    const newClass = new Class({
+        tutor: req.tutor._id,
+        name: req.body.name,
+        date: req.body.date,
+        subject: req.body.subject,
+        area: req.body.area,
+        availability: req.body.availability,
+        description: req.body.description,
+        cost: req.body.cost
+    });
+
+    newClass.save()
+     .then(newClass => {
+        console.log(newClass);
+        res.json(newClass);
+    })
+     .catch(error => res.status(404).send(error.message));
+});
+
+router.delete('/class/:id', auth, (req, res) => {
+    Class.findByIdAndDelete(req.params.id)
+     .then(deletedClass => {
+        console.log(deletedClass);
+        res.json(deletedClass);
+    })
+     .catch(error => res.status(404).send(error.message));
+});
+
+router.put('/class/:id', auth, (req, res) => {
+    Class.findByIdAndUpdate(req.params.id, {
+        name: req.body.name,
+        date: req.body.date,
+        subject: req.body.subject,
+        area: req.body.area,
+        availability: req.body.availability,
+        description: req.body.description,
+        cost: req.body.cost
+    }, { new: true })
+     .then(updatedClass => {
+        console.log(updatedClass);
+        res.json(updatedClass);
+     })
+     .catch(error => res.status(404).send(error.message));
 });
 
 module.exports = router;
