@@ -62,10 +62,11 @@ router.get('/classes', auth, (req, res) => {
             console.log([]);
             res.json([]);
         }
-
-        let arrClasses = classes.map(c => c.toObject());
-        console.log(arrClasses);
-        res.json(arrClasses);
+        else {
+            let arrClasses = classes.map(c => c.toObject());
+            console.log(arrClasses);
+            res.json(arrClasses);
+        }
     });
 });
 
