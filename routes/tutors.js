@@ -4,12 +4,12 @@ const router = express.Router();
 const auth = require('../middleware/tutor-auth');
 const Tutor = require('./../model/tutor');
 const Class = require('./../model/class');
-const { postValidation } = require('./../core/validators/tutor-validator');
+const { postValidation, classValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
 /*
     TODO: 
-    2. Modify Joi schema for only acception categories given an array
+    2. Modify Joi schema for only accepting categories given an array
     3. Store Image
 */
 router.post('/signup', (req, res) => {
@@ -56,6 +56,8 @@ router.get('/dashboard', auth, (req, res) => {
 
 });
 
+
+//      CLASSES FUNCTIONS
 router.get('/classes', auth, (req, res) => {
     const classes = Class.find({ tutor: req.tutor._id }).exec(function(err, classes) {
         if(!classes.length) {
@@ -70,7 +72,11 @@ router.get('/classes', auth, (req, res) => {
     });
 });
 
+
 router.post('/class', auth, (req, res) => {
+    var { error } = classValidation(req.body);
+    if (error) return res.status(404).send(error.details[0].message);
+
     const newClass = new Class({
         tutor: req.tutor._id,
         name: req.body.name,
@@ -100,6 +106,9 @@ router.delete('/class/:id', auth, (req, res) => {
 });
 
 router.put('/class/:id', auth, (req, res) => {
+    var { error } = classValidation(req.body);
+    if (error) return res.status(404).send(error.details[0].message);
+
     Class.findByIdAndUpdate(req.params.id, {
         name: req.body.name,
         date: req.body.date,
