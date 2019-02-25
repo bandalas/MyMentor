@@ -3,6 +3,7 @@ const router = express.Router();
 
 const auth = require('../middleware/student-auth');
 const Student = require('./../model/student');
+const Class = require('./../model/class');
 const { postValidation } = require('./../core/validators/student-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
@@ -50,6 +51,19 @@ router.post('/signup', (req, res) => {
 router.get('/dashboard', auth, (req, res) => {
     res.send('Welcome ' + req.student.name +' ! id: '+ req.student._id);
 
+});
+
+router.get('/classes', auth, (req, res) => {
+    const classes = Class.find().exec(function(err, classes) {
+        if(!classes.length) {
+            console.log([]);
+            res.json([]);
+        }
+
+        let arrClasses = classes.map(c => c.toObject());
+        console.log(arrClasses);
+        res.json(arrClasses);
+    });
 });
 
 module.exports = router;
