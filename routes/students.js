@@ -5,7 +5,9 @@ const auth = require('../middleware/student-auth');
 const Student = require('./../model/student');
 const Class = require('./../model/class');
 const { postValidation } = require('./../core/validators/student-validator');
+const { validatePostReseña } = require('./../core/validators/student-validator');
 const { hashPassword } = require('./../core/password-hasher');
+const Reseña = require('./../model/reseña');
 
 /*
 	TODO:
@@ -66,5 +68,24 @@ router.get('/classes', auth, (req, res) => {
         }
     });
 });
+
+router.post('/new-review/:id-class', (req, res) =>{
+    //Check first the input of the user
+    try {
+        var { error } = validatePostReseña(req.body);
+        if (error) throw new Error(error.details[0].message);
+
+        Reseña.comentario = req.body.comentario
+        Reseña.estrella = req.body.estrella
+        Reseña.fecha = Date()
+    
+        var object = {comentario: Reseña.comentario, estrella: Reseña.estrella, fecha: Reseña.fecha}
+        //Sending the object
+        res.status(404).send(object)
+    }
+    catch(error){
+        res.status(404).send(error.message);
+    }
+})
 
 module.exports = router;
