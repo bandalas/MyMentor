@@ -86,7 +86,7 @@ router.post('/new-review/:id', auth, (req, res) =>{
       review.save()
         .then(review => {
             console.log(review);
-            res.status(404).send(review)
+            res.json(review)
         })
         .catch(error => res.status(404).send(error.message));
     })
