@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema({
-	clase: {
+	class: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Class'
 	},
@@ -9,9 +9,9 @@ const reviewSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Student'
 	},
-    comentario: { type: String, required: true},
-    estrella: {type: Number, required: true},
-    fecha: {type: Date, default: Date.now }
+    comment: { type: String, required: true},
+    stars: {type: Number, required: true},
+    date: {type: Date, default: Date.now }
 });
 
 const Review = mongoose.model('Review', reviewSchema);

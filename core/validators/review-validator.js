@@ -1,12 +1,12 @@
 const Joi = require('joi');
 
 const postSchema = {
-    comentario: Joi.string().required(),
-    estrella: Joi.number().integer().required()
+    comment: Joi.string().required(),
+    stars: Joi.number().integer().required()
 };
 
 function validatePostInput(input){
     return Joi.validate(input, postSchema);
 }
 
-module.exports.validatePostInput = validatePostInput;
+module.exports.postReview = validatePostInput;

@@ -69,17 +69,18 @@ router.get('/classes', auth, (req, res) => {
     });
 });
 
-router.post('/new-review/:id', (req, res) =>{
+router.post('/new-review/:id', auth, (req, res) =>{
     //Check first the input of the user
     var { error } = postReview(req.body);
     if (error) throw new Error(error.details[0].message);
 
-    Class.find({ _id: req.params.id }).then( classId => {
+    Class.findOne({ _id: req.params.id }).then( tutorClass => {
       const review = new Review({
-            class: classId,
-            comentario: req.body.comentario,
-            estrella: req.body.estrella,
-            fecha: req.body.date
+            student: req.student._id,
+            class: tutorClass._id,
+            comment: req.body.comment,
+            stars: req.body.stars,
+            date: req.body.date
         })
 
       review.save()
