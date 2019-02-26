@@ -11,11 +11,6 @@ const postSchema = {
     img: Joi.string()
 };
 
-const postReseña = {
-    comentario: Joi.string().required(),
-    estrella: Joi.number().integer().required()
-};
-
 function validatePostInput(input) {
     return Joi.validate(input, postSchema);
 }
@@ -30,10 +25,5 @@ function validateAuthentication(request) {
     return Joi.validate(request, authenticationSchema);
 }
 
-function validatePostReseña(input){
-    return Joi.validate(input, postReseña);
-}
-
 module.exports.postValidation = validatePostInput;
 module.exports.validateAuthentication = validateAuthentication;
-module.exports.validatePostReseña = validatePostReseña;
