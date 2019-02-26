@@ -18,6 +18,19 @@ function validatePostInput(input) {
     return Joi.validate(input, postSchema);
 }
 
+//              Class
+const classPostSchema = {
+    name: Joi.string().min(3).required(),
+    subject: Joi.string().required(),
+    area: Joi.string().required(),
+    description: Joi.string().required(),
+    cost: Joi.number().required()
+};
+
+function validateClassInput(input) {
+    return Joi.validate(input, classPostSchema);
+}
+
 // General schema and function for authenticating tutors
 const authenticationSchema = {
     email: Joi.string().email().required(),
@@ -30,3 +43,4 @@ function validateAuthentication(request) {
 
 module.exports.postValidation = validatePostInput;
 module.exports.validateAuthentication = validateAuthentication;
+module.exports.classValidation = validateClassInput;

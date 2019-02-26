@@ -1,3 +1,8 @@
+/*
+    Class model
+    A tutor teaches a class, a class will contain many attributes such as: name,
+    date, subject, area, availability, description and cost.
+*/
 const mongoose = require('mongoose');
 
 const classSchema = new mongoose.Schema({
@@ -6,10 +11,10 @@ const classSchema = new mongoose.Schema({
 			ref: 'Tutor'
 	},
     name: { type: String, required: true, minlength: 3, maxlength: 100 },
-    date: { type: Date, required: true, unique: false },
+    date: { type: Date, default: Date.now },
     subject: { type: String, required: true, unique: false },
     area: { type: String, required: true },
-    availability: { type: Array, default: [], required: true },
+    availability: { type: Boolean, default: true },
     description: { type: String, required: true },
     cost: { type: Number, required: true }
 });

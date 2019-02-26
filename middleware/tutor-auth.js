@@ -5,9 +5,12 @@ function denyAccess(res) {
 }
 
 function auth(req, res, next) {
+    // Looks for the data on the header that matches
     const token = req.header('x-auth-token');
+    // If no token is given, then we deny the access to the user
     if(!token) denyAccess(res);
     try {
+        // Decodes the token using the private key
         const decoded = jwt.verify(token, 'jwtPrivateKey');
         if(decoded.type !== 'Tutor')
             denyAccess(res);
