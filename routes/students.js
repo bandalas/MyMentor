@@ -4,10 +4,13 @@ const router = express.Router();
 const auth = require('../middleware/student-auth');
 const Student = require('./../model/student');
 const Class = require('./../model/class');
+const Review = require('./../model/review');
+const Booking = require('./../model/booking');
+
 const { postValidation } = require('./../core/validators/student-validator');
 const { postReview } = require('./../core/validators/review-validator');
 const { hashPassword } = require('./../core/password-hasher');
-const Review = require('./../model/review');
+
 
 /*
 	TODO:
@@ -93,4 +96,27 @@ router.post('/new-review/:id', auth, (req, res) =>{
     .catch(error => res.status(404).send(error.message));
 })
 
+//          B   O   O   K   I   N   G
+router.post('/book/:id',auth, (req, res) => {
+    Class.findById(req.params.id)
+     .then(queried_class => {
+         if(!queried_class) throw new Error('Class was not found.');
+         
+         const student_id = req.student._id;
+         const tutor_id = queried_class.tutor
+         const booking = new Booking({
+             tutor: tutor_id,
+             student: student_id,
+             booked_class: queried_class._id
+         });
+         
+         booking.save()
+          .then(booking => {
+              res.send(booking)
+          })
+          .catch(error => res.status(404).send(error.message));
+          
+     })
+     .catch(error => res.status(404).send(error.message))
+});
 module.exports = router;

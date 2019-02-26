@@ -21,6 +21,7 @@ function validatePostInput(input) {
 //              Class
 const classPostSchema = {
     name: Joi.string().min(3).required(),
+    date: Joi.any().optional(),
     subject: Joi.string().required(),
     area: Joi.string().required(),
     description: Joi.string().required(),

@@ -6,6 +6,7 @@ const app = express();
 const tutors = require('./routes/tutors');
 const students = require('./routes/students');
 const auth = require('./routes/auth');
+const bookings = require('./routes/bookings')
 
 // Setting up db connection
 mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 app.use('/tutors/', tutors);
 app.use('/students/', students);
 app.use('/auth/', auth);
+app.use('/tutors/bookings', bookings);
 
 const port = process.env.PORT || 3000;
 app.listen(port,() => {

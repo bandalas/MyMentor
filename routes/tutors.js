@@ -4,6 +4,7 @@ const router = express.Router();
 const auth = require('../middleware/tutor-auth');
 const Tutor = require('./../model/tutor');
 const Class = require('./../model/class');
+
 const { postValidation, classValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
@@ -83,7 +84,6 @@ router.post('/class', auth, (req, res) => {
         date: req.body.date,
         subject: req.body.subject,
         area: req.body.area,
-        availability: req.body.availability,
         description: req.body.description,
         cost: req.body.cost
     });
