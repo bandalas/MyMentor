@@ -10,10 +10,10 @@ router.get('/',auth, (req, res) => {
         tutor : tutor_id,
         status: 'Pending'
     })
-     .sort({date:1})
+     .sort({ date:1 })
      .then((booking) => {
          if(!booking) res.send('No booking requests yet.');
-         res.send(booking)
+         res.send(booking);
       })
      .catch(error => res.status(404).send(error.message));
 });
@@ -35,7 +35,7 @@ router.put('/accept/:id', auth, (req, res) => {
             }})
          bulk.execute()
          .then(updated_bulk => {
-             res.send(updated)
+             res.send(updated);
             })
          .catch(error => res.status(404).send(error.message));
      })
@@ -47,7 +47,7 @@ router.put('/reject/:id', auth, (req, res) => {
         status: 'Rejected'
     }, {new : true})
      .then((updated) => {
-         res.send(updated)
+         res.send(updated);
      })
      .catch(error => res.status(404).send(error.message));
 });

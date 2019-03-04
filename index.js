@@ -6,7 +6,7 @@ const app = express();
 const tutors = require('./routes/tutors');
 const students = require('./routes/students');
 const auth = require('./routes/auth');
-const bookings = require('./routes/bookings')
+const bookings = require('./routes/bookings');
 
 // Setting up db connection
 mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})

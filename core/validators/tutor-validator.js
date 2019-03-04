@@ -32,6 +32,15 @@ function validateClassInput(input) {
     return Joi.validate(input, classPostSchema);
 }
 
+//              Report
+const reportPostSchema = {
+    description: Joi.string().required()
+};
+
+function validateReportInput(input) {
+    return Joi.validate(input, reportPostSchema);
+}
+
 // General schema and function for authenticating tutors
 const authenticationSchema = {
     email: Joi.string().email().required(),
@@ -45,3 +54,4 @@ function validateAuthentication(request) {
 module.exports.postValidation = validatePostInput;
 module.exports.validateAuthentication = validateAuthentication;
 module.exports.classValidation = validateClassInput;
+module.exports.reportValidation = validateReportInput;

@@ -4,8 +4,10 @@ const router = express.Router();
 const auth = require('../middleware/tutor-auth');
 const Tutor = require('./../model/tutor');
 const Class = require('./../model/class');
+const Review = require('./../model/review');
+const Report = require('./../model/report');
 
-const { postValidation, classValidation } = require('./../core/validators/tutor-validator');
+const { postValidation, classValidation, reportValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
 /*
@@ -123,6 +125,29 @@ router.put('/class/:id', auth, (req, res) => {
         res.json(updatedClass);
      })
      .catch(error => res.status(404).send(error.message));
+});
+
+//          R  E  P  O  R  T  S
+router.post('/report-review/:id', auth, (req, res) =>{
+    //Check first the input of the user
+    var { error } = reportValidation(req.body);
+    if (error) throw new Error(error.details[0].message);
+
+    Review.findOne({ _id: req.params.id }).then( review => {
+        const report = new Report({
+            review: review._id,
+            tutor: req.tutor._id,
+            description: req.body.description
+        });
+
+        report.save()
+         .then(review => {
+            console.log(report);
+            res.json(report);
+        })
+         .catch(error => res.status(404).send(error.message));
+    })
+    .catch(error => res.status(404).send(error.message));
 });
 
 module.exports = router;

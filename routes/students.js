@@ -89,12 +89,12 @@ router.post('/new-review/:id', auth, (req, res) =>{
       review.save()
         .then(review => {
             console.log(review);
-            res.json(review)
+            res.json(review);
         })
         .catch(error => res.status(404).send(error.message));
     })
     .catch(error => res.status(404).send(error.message));
-})
+});
 
 //          B   O   O   K   I   N   G
 router.post('/book/:id',auth, (req, res) => {
@@ -112,7 +112,7 @@ router.post('/book/:id',auth, (req, res) => {
          
          booking.save()
           .then(booking => {
-              res.send(booking)
+              res.send(booking);
           })
           .catch(error => res.status(404).send(error.message));
           
