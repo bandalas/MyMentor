@@ -6,6 +6,7 @@ const Tutor = require('./../model/tutor');
 const Class = require('./../model/class');
 const Review = require('./../model/review');
 const Report = require('./../model/report');
+const Booking = require('./../model/booking');
 
 const { postValidation, classValidation, reportValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
@@ -148,6 +149,20 @@ router.post('/report-review/:id', auth, (req, res) =>{
          .catch(error => res.status(404).send(error.message));
     })
     .catch(error => res.status(404).send(error.message));
+});
+
+router.get('/booking', auth, (req, res) => {
+    const booking = Booking.find({tutor: req.tutor._id, status: "Pending" }).exec(function(err, booking) {
+        if(!booking.length) {
+            console.log([]);
+            res.json([]);
+        }
+        else {
+            let arrBooks = booking.map(c => c.toObject());
+            console.log(arrBooks);
+            res.json(arrBooks);
+        }
+    });
 });
 
 module.exports = router;
