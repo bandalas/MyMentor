@@ -120,12 +120,13 @@ router.post('/book/:id',auth, (req, res) => {
      .catch(error => res.status(404).send(error.message))
 });
 
-router.delete('/booking/:id', auth, (req, res) => {
-    Booking.findByIdAndDelete(req.params.id)
-    
-    .then(deletedBooking => {
-       console.log(deletedBooking);
-       res.json(deletedBooking);
+router.put('/booking/:id', auth, (req, res) => {
+    Booking.findByIdAndUpdate(req.params.id, {
+        status: 'Cancelled'
+    }, { new: true })
+     .then(cancelledBooking => {
+        console.log(cancelledBooking);
+        res.json(cancelledBooking);
    })
     .catch(error => res.status(404).send(error.message));
 })
