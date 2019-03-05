@@ -8,6 +8,7 @@ const students = require('./routes/students');
 const auth = require('./routes/auth');
 const bookings = require('./routes/bookings');
 const admins = require('./routes/admins');
+const notifications = require('./routes/notifications');
 
 // Setting up db connection
 mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
@@ -18,6 +19,7 @@ mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
 app.use(bodyParser.json());
 app.use('/tutors/', tutors);
 app.use('/students/', students);
+app.use('/students/notifications', notifications);
 app.use('/auth/', auth);
 app.use('/tutors/bookings', bookings);
 app.use('/admins/', admins);
