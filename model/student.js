@@ -8,6 +8,8 @@ const User = require('./user');
 
 // Student inherits everything from User and adds the following for the schema:
 const studentSchema = User.discriminator('Student', new mongoose.Schema({
+    institution: { type: String, required: true },
+    semester: { type: Number, required: true },
     img: { type: String, data: Buffer, required: false }
 }));
 

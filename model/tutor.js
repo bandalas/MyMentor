@@ -10,6 +10,8 @@ const category_options = [ 'Lenguas', 'Ciencias' ];
 
 // Tutor inherits everything from User and adds the following for the schema:
 const tutorSchema = User.discriminator('Tutor', new mongoose.Schema({
+    institution: { type: String, required: true },
+    semester: { type: Number, required: true },
     img: { type: String, data: Buffer, required: true },
     description: { type: String , required: true },
     category: { type: String, enum: category_options },
