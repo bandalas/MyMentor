@@ -58,18 +58,13 @@ router.get('/dashboard', auth, (req, res) => {
 
 });
 
-router.get('/classes', auth, (req, res) => {
-    const classes = Class.find().exec(function(err, classes) {
-        if(!classes.length) {
-            console.log([]);
-            res.json([]);
-        }
-        else {
-            let arrClasses = classes.map(c => c.toObject());
-            console.log(arrClasses);
-            res.json(arrClasses);
-        }
-    });
+router.get('/classes', (req, res) => {
+    Class.find({ availability: true })
+     .then(classes => {
+        console.log(classes)
+        res.json(classes)
+     })
+     .catch(error => res.status(404).send(error.message));
 });
 
 router.post('/new-review/:id', auth, (req, res) =>{

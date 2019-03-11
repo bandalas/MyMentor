@@ -63,17 +63,12 @@ router.get('/dashboard', auth, (req, res) => {
 
 //      CLASSES FUNCTIONS
 router.get('/classes', auth, (req, res) => {
-    const classes = Class.find({ tutor: req.tutor._id }).exec(function(err, classes) {
-        if(!classes.length) {
-            console.log([]);
-            res.json([]);
-        }
-        else {
-            let arrClasses = classes.map(c => c.toObject());
-            console.log(arrClasses);
-            res.json(arrClasses);
-        }
-    });
+    Class.find({ tutor: req.tutor._id })
+     .then(classes => {
+        console.log(classes)
+        res.json(classes)
+     })
+     .catch(error => res.json(404).send(error.message));
 });
 
 
