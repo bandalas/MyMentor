@@ -5,6 +5,10 @@ const reviewSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Class'
 	},
+	tutor: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Tutor'
+	},
 	student: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Student'

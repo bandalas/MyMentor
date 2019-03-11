@@ -10,6 +10,7 @@ const classSchema = new mongoose.Schema({
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Tutor'
 	},
+    tutor_rating: { type: Number, default: 0 },
     name: { type: String, required: true, minlength: 3, maxlength: 100 },
     date: { type: Date, default: Date.now },
     subject: { type: String, required: true, unique: false },

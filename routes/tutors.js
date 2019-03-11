@@ -76,22 +76,27 @@ router.post('/class', auth, (req, res) => {
     var { error } = classValidation(req.body);
     if (error) return res.status(404).send(error.details[0].message);
 
-    const newClass = new Class({
-        tutor: req.tutor._id,
-        name: req.body.name,
-        date: req.body.date,
-        subject: req.body.subject,
-        area: req.body.area,
-        description: req.body.description,
-        cost: req.body.cost
-    });
+    Tutor.findOne({ _id: req.tutor._id })
+     .then( tutor => {
+         const newClass = new Class({
+             tutor: req.tutor._id,
+             tutor_rating: tutor.getAverageRating(),
+             name: req.body.name,
+             date: req.body.date,
+             subject: req.body.subject,
+             area: req.body.area,
+             description: req.body.description,
+             cost: req.body.cost
+         });
 
-    newClass.save()
-     .then(newClass => {
-        console.log(newClass);
-        res.json(newClass);
-    })
-     .catch(error => res.status(404).send(error.message));
+         newClass.save()
+          .then(newClass => {
+             console.log(newClass);
+             res.json(newClass);
+         })
+          .catch(error => res.status(404).send(error.message));
+        
+     })
 });
 
 router.delete('/class/:id', auth, (req, res) => {

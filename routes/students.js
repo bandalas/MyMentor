@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const auth = require('../middleware/student-auth');
+const Tutor = require('./../model/tutor');
 const Student = require('./../model/student');
 const Class = require('./../model/class');
 const Review = require('./../model/review');
@@ -75,11 +76,12 @@ router.post('/new-review/:id', auth, (req, res) =>{
     Class.findOne({ _id: req.params.id }).then( tutorClass => {
       const review = new Review({
             student: req.student._id,
+            tutor: tutorClass.tutor,
             class: tutorClass._id,
             comment: req.body.comment,
             stars: req.body.stars,
             date: req.body.date
-        })
+      });
 
       review.save()
         .then(review => {
@@ -87,6 +89,17 @@ router.post('/new-review/:id', auth, (req, res) =>{
             res.json(review);
         })
         .catch(error => res.status(404).send(error.message));
+
+      Tutor.findOne({ _id: tutorClass.tutor })
+       .then(async tutor => {
+           tutor.stars += review.stars;
+           tutor.save()
+            .catch(error => res.status(404).send(error.message));
+
+           tutorClass.tutor_rating = await tutor.getAverageRating();
+           tutorClass.save()
+            .catch(error => res.status(404).send(error.message));
+       })
     })
     .catch(error => res.status(404).send(error.message));
 });

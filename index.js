@@ -9,6 +9,7 @@ const auth = require('./routes/auth');
 const bookings = require('./routes/bookings');
 const admins = require('./routes/admins');
 const notifications = require('./routes/notifications');
+const searches = require('./routes/searches');
 
 // Setting up db connection
 mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
@@ -16,6 +17,9 @@ mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
  .catch((err)=> {console.log('Failed to connect with error: ', err.message);});
 
 // Setting routes
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(bodyParser.json());
 app.use('/tutors/', tutors);
 app.use('/students/', students);
@@ -23,6 +27,7 @@ app.use('/students/notifications', notifications);
 app.use('/auth/', auth);
 app.use('/tutors/bookings', bookings);
 app.use('/admins/', admins);
+app.use('/search/', searches);
 
 const port = process.env.PORT || 3000;
 app.listen(port,() => {
