@@ -17,21 +17,9 @@ router.get('/class', (req, res) => {
     if(req.body.cost) {
         search_params.cost = { $lte: req.body.cost }
     }
-
-    Class.find(search_params)
-     .then(matches => {
-        console.log(matches);
-        res.json(matches);
-     })
-     .catch(error => res.status(404).send(error.message))
-});
-
-router.get('/class/by-average', (req, res) => {
-    var search_params = {}
     if(req.body.average) {
         search_params.tutor_rating = { $gte: req.body.average }
     }
-    console.log(search_params);
 
     Class.find(search_params)
      .then(matches => {

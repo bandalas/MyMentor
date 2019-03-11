@@ -152,17 +152,12 @@ router.post('/report-review/:id', auth, (req, res) =>{
 });
 
 router.get('/booking', auth, (req, res) => {
-    const booking = Booking.find({tutor: req.tutor._id, status: "Pending" }).exec(function(err, booking) {
-        if(!booking.length) {
-            console.log([]);
-            res.json([]);
-        }
-        else {
-            let arrBooks = booking.map(c => c.toObject());
-            console.log(arrBooks);
-            res.json(arrBooks);
-        }
-    });
+    Booking.find({tutor: req.tutor._id, status: "Pending" })
+     .then(bookings => {
+         console.log(bookings);
+         res.json(bookings);
+    })
+     .catch(error => res.status(404).send(error.message));
 });
 
 module.exports = router;
