@@ -3,6 +3,7 @@ const router = express.Router();
 
 const auth = require('../middleware/admin-auth');
 const Admin = require('./../model/admin');
+const Report = require('./../model/report');
 const Class = require('./../model/class');
 const { postValidation, classValidation, reportValidation } = require('./../core/validators/admin-validator');
 const { hashPassword } = require('./../core/password-hasher');
@@ -63,6 +64,20 @@ router.get('/classes', auth, (req, res) => {
             let arrClasses = classes.map(c => c.toObject());
             console.log(arrClasses);
             res.json(arrClasses);
+        }
+    });
+});
+
+router.get('/reports', auth, (req, res) =>{
+ const reports = Report.find().exec(function(err, reports) {
+if(!reports.length) {
+            console.log([]);
+            res.json([]);
+        }
+        else {
+            let arrReports = reports.map(c => c.toObject());
+            console.log(arrReports);
+            res.json(arrReports);
         }
     });
 });
