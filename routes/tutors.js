@@ -63,7 +63,7 @@ router.get('/dashboard', auth, (req, res) => {
 
 //      CLASSES FUNCTIONS
 router.get('/classes', auth, (req, res) => {
-    Class.find({ tutor: req.tutor._id })
+    Class.find({ tutor: req.tutor._id, availability: true})
      .then(classes => {
         console.log(classes)
         res.json(classes)
