@@ -28,8 +28,6 @@ router.post('/signup', (req, res) => {
                 lastName:  req.body.lastName,
                 email: req.body.email,
                 password: hashedPassword,
-                institution: req.body.institution,
-                semester:  req.body.semester
             });
 
             // Saving function, async function
@@ -69,17 +67,12 @@ router.get('/classes', auth, (req, res) => {
 });
 
 router.get('/reports', auth, (req, res) =>{
- const reports = Report.find().exec(function(err, reports) {
-if(!reports.length) {
-            console.log([]);
-            res.json([]);
-        }
-        else {
-            let arrReports = reports.map(c => c.toObject());
-            console.log(arrReports);
-            res.json(arrReports);
-        }
-    });
+    Report.find()
+     .then(reports => {
+        console.log(reports)
+        res.json(reports)
+     })
+     .catch(error => res.json(404).send(error.message));
 });
 
 module.exports = router;

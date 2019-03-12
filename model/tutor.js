@@ -22,7 +22,8 @@ var tutorSchema = new mongoose.Schema({
 
 tutorSchema.methods.getAverageRating = async function() {
     const reviews = await Review.find({ tutor: this._id });
-    return this.stars / reviews.length;
+    const rating = this.stars / reviews.length;
+    return isNaN(rating) ? 0 : rating;
 }
 
 User.discriminator('Tutor', tutorSchema);

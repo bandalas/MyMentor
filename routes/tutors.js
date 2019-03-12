@@ -77,10 +77,10 @@ router.post('/class', auth, (req, res) => {
     if (error) return res.status(404).send(error.details[0].message);
 
     Tutor.findOne({ _id: req.tutor._id })
-     .then( tutor => {
+     .then( async tutor => {
          const newClass = new Class({
              tutor: req.tutor._id,
-             tutor_rating: tutor.getAverageRating(),
+             tutor_rating: await tutor.getAverageRating(),
              name: req.body.name,
              date: req.body.date,
              subject: req.body.subject,
@@ -99,11 +99,13 @@ router.post('/class', auth, (req, res) => {
      })
 });
 
-router.delete('/class/:id', auth, (req, res) => {
-    Class.findByIdAndDelete(req.params.id)
-     .then(deletedClass => {
-        console.log(deletedClass);
-        res.json(deletedClass);
+router.put('/cancel-class/:id', auth, (req, res) => {
+    Class.findByIdAndUpdate(req.params.id, {
+        availability: false
+    }, { new: true })
+     .then(canceledClass => {
+        console.log(canceledClass);
+        res.json(canceledClass);
     })
      .catch(error => res.status(404).send(error.message));
 });
