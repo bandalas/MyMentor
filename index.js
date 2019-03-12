@@ -3,6 +3,17 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 
 const app = express();
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
+    if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+    }
+    next();
+});
+
 const tutors = require('./routes/tutors');
 const students = require('./routes/students');
 const auth = require('./routes/auth');
@@ -29,7 +40,7 @@ app.use('/tutors/bookings', bookings);
 app.use('/admins/', admins);
 app.use('/search/', searches);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port,() => {
     console.log(`Listening to port ${port}`);
 });
