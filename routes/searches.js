@@ -20,6 +20,9 @@ router.get('/class', (req, res) => {
     if(req.body.average) {
         search_params.tutor_rating = { $gte: req.body.average }
     }
+    if(req.body.startDate && req.body.endDate){
+        search_params.date = {$gte: req.body.startDate, $lt: req.body.endDate}
+    }
 
     Class.find(search_params)
      .then(matches => {
