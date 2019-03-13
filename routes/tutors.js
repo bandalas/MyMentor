@@ -162,4 +162,17 @@ router.get('/booking', auth, (req, res) => {
      .catch(error => res.status(404).send(error.message));
 });
 
+//Date Filter
+router.get('/search/classes', auth, (req, res) => {
+    Class.find({tutor: req.tutor._id, 
+        date:{
+            $gte: req.body.startDate, 
+            $lt: req.body.endDate
+        }})
+    .then(matches => {
+        console.log(matches);
+        res.json(matches);
+     })
+     .catch(error => res.status(404).send(error.message));
+});
 module.exports = router;
