@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
-
+var cors = require('cors');
 const app = express();
 
 app.use(function(req, res, next) {
@@ -9,7 +9,7 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
     res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
     if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
+        return res.sendStatus(204);
     }
     next();
 });
@@ -32,6 +32,8 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
+app.use(cors());
+app.options('*', cors());
 app.use('/tutors/', tutors);
 app.use('/students/', students);
 app.use('/students/notifications', notifications);
