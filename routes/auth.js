@@ -8,14 +8,10 @@ const { unhashPassword } = require('./../core/password-hasher');
 
 router.post('/', (req, res) => {
     try {
-        // Checks whether the body of the request is correct;
-        var { error } = validateAuthentication(req.body);
-        if (error) throw new Error(error.details[0].message);
-        const error_invalid_msg = 'Invalid email or password';
-
         // Checks if the tutor exists
         User.findOne({ email: req.body.email})
          .then((user)=> {
+             if(!user) return res.send(recordNotFound());
              // Checks if hashed password of the record matches input
              unhashPassword(req.body.password, user.password)
                 // Returns boolean of whether if the password was valid or not
@@ -24,17 +20,26 @@ router.post('/', (req, res) => {
 
                   // Password matches, thus authentication should be performed
                   const token = user.generateToken();
-                  res.send(token);
+                  const response_body = {
+                      'token': token,
+                      'user': user,
+                      'type': user.usertype
+                  }
+                  res.send(response_body);
               });
          })
          // No record was found with the given email
          .catch((error) => {
-             res.status(400).send(error_invalid_msg);
+             res.status(400).send(error.message);
          });
 
     } catch(error) {
         res.status(404).send(error.message);
     }
 });
+
+function recordNotFound() {
+    return { 'record_not_found': true };
+}
 
 module.exports = router;
