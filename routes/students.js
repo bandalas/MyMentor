@@ -59,6 +59,15 @@ router.get('/dashboard', auth, (req, res) => {
 
 });
 
+router.get('/mentors', auth, (req, res) => {
+Tutor.find().sort({stars: 1})
+     .then(mentors => {
+        console.log(mentors)
+        res.json(mentors)
+     })
+     .catch(error => res.status(404).send(error.message));
+});
+
 router.get('/classes', (req, res) => {
     Class.find({ availability: true })
      .then(classes => {
