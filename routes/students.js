@@ -68,11 +68,20 @@ Tutor.find().sort({stars: 1})
      .catch(error => res.status(404).send(error.message));
 });
 
-router.get('/classes', (req, res) => {
+router.get('/classes',auth, (req, res) => {
     Class.find({ availability: true })
      .then(classes => {
         console.log(classes)
         res.json(classes)
+     })
+     .catch(error => res.status(404).send(error.message));
+});
+
+router.get('/new-classes', auth, (req, res) => {
+    Class.find({availability: true})
+     .hint({$natural:-1})
+     .then(classes => {
+         res.json(classes)
      })
      .catch(error => res.status(404).send(error.message));
 });
