@@ -123,6 +123,20 @@ router.post('/new-review/:id', auth, (req, res) =>{
 });
 
 //          B   O   O   K   I   N   G
+router.get('/bookings', auth, (req, res) => {
+    const student_id = req.student._id
+    Booking.find({
+        student : student_id,
+        status: 'Pending'
+    })
+     .sort({ date:1 })
+     .then((booking) => {
+         if(!booking) res.send('No booking requests yet.');
+         res.send(booking);
+      })
+     .catch(error => res.status(404).send(error.message));
+});
+
 router.post('/book/:id',auth, (req, res) => {
     Class.findById(req.params.id)
      .then(queried_class => {

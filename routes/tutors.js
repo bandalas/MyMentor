@@ -153,15 +153,6 @@ router.post('/report-review/:id', auth, (req, res) =>{
     .catch(error => res.status(404).send(error.message));
 });
 
-router.get('/booking', auth, (req, res) => {
-    Booking.find({tutor: req.tutor._id, status: "Pending" })
-     .then(bookings => {
-         console.log(bookings);
-         res.json(bookings);
-    })
-     .catch(error => res.status(404).send(error.message));
-});
-
 //Date Filter
 router.get('/search/classes', auth, (req, res) => {
     Class.find({tutor: req.tutor._id, 
