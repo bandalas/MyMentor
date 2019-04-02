@@ -15,7 +15,7 @@ function auth(req, res, next) {
         req.student = decoded;
         next();        
     } catch(e) {
-        res.status(400).send('Invalid token');
+        res.status(401).send('Invalid token');
     }
 }
 

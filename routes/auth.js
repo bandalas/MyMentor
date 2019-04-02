@@ -26,6 +26,9 @@ router.post('/', (req, res) => {
                       'type': user.usertype
                   }
                   res.send(response_body);
+              })
+              .catch((error) => {
+                  res.status(400).send(error.message);
               });
          })
          // No record was found with the given email

@@ -46,11 +46,11 @@ router.post('/signup', (req, res) => {
                 const token = tutor.generateToken();
                 res.header('x-auth-token',token).send(tutor);
             })
-             .catch(error => res.status(404).send(error.message));
+             .catch(error => res.status(400).send(error.message));
 
          });
     } catch(error) {
-        res.status(404).send(error.message);
+        res.status(400).send(error.message);
     }
 });
 
@@ -68,13 +68,13 @@ router.get('/classes', auth, (req, res) => {
         console.log(classes)
         res.json(classes)
      })
-     .catch(error => res.json(404).send(error.message));
+     .catch(error => res.json(400).send(error.message));
 });
 
 
 router.post('/class', auth, (req, res) => {
     var { error } = classValidation(req.body);
-    if (error) return res.status(404).send(error.details[0].message);
+    if (error) return res.status(400).send(error.details[0].message);
 
     Tutor.findOne({ _id: req.tutor._id })
      .then( async tutor => {
@@ -94,7 +94,7 @@ router.post('/class', auth, (req, res) => {
              console.log(newClass);
              res.json(newClass);
          })
-          .catch(error => res.status(404).send(error.message));
+          .catch(error => res.status(400).send(error.message));
         
      })
 });
@@ -107,12 +107,12 @@ router.put('/cancel-class/:id', auth, (req, res) => {
         console.log(canceledClass);
         res.json(canceledClass);
     })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 router.put('/class/:id', auth, (req, res) => {
     var { error } = classValidation(req.body);
-    if (error) return res.status(404).send(error.details[0].message);
+    if (error) return res.status(400).send(error.details[0].message);
 
     Class.findByIdAndUpdate(req.params.id, {
         name: req.body.name,
@@ -127,7 +127,7 @@ router.put('/class/:id', auth, (req, res) => {
         console.log(updatedClass);
         res.json(updatedClass);
      })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 //          R  E  P  O  R  T  S
@@ -148,9 +148,9 @@ router.post('/report-review/:id', auth, (req, res) =>{
             console.log(report);
             res.json(report);
         })
-         .catch(error => res.status(404).send(error.message));
+         .catch(error => res.status(400).send(error.message));
     })
-    .catch(error => res.status(404).send(error.message));
+    .catch(error => res.status(400).send(error.message));
 });
 
 //Date Filter
@@ -164,6 +164,6 @@ router.get('/search/classes', auth, (req, res) => {
         console.log(matches);
         res.json(matches);
      })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 module.exports = router;

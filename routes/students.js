@@ -45,11 +45,11 @@ router.post('/signup', (req, res) => {
                 const token = student.generateToken();
                 res.header('x-auth-token', token).send(student);
             })
-             .catch(error => res.status(404).send(error.message));
+             .catch(error => res.status(400).send(error.message));
 
          });
     } catch(error) {
-        res.status(404).send(error.message);
+        res.status(400).send(error.message);
     }
 });
 
@@ -65,7 +65,7 @@ Tutor.find().sort({stars: 1})
         console.log(mentors)
         res.json(mentors)
      })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 router.get('/classes',auth, (req, res) => {
@@ -74,7 +74,7 @@ router.get('/classes',auth, (req, res) => {
         console.log(classes)
         res.json(classes)
      })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 router.get('/new-classes', auth, (req, res) => {
@@ -83,7 +83,7 @@ router.get('/new-classes', auth, (req, res) => {
      .then(classes => {
          res.json(classes)
      })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 router.post('/new-review/:id', auth, (req, res) =>{
@@ -106,20 +106,20 @@ router.post('/new-review/:id', auth, (req, res) =>{
             console.log(review);
             res.json(review);
         })
-        .catch(error => res.status(404).send(error.message));
+        .catch(error => res.status(400).send(error.message));
 
       Tutor.findOne({ _id: tutorClass.tutor })
        .then(async tutor => {
            tutor.stars += review.stars;
            tutor.save()
-            .catch(error => res.status(404).send(error.message));
+            .catch(error => res.status(400).send(error.message));
 
            tutorClass.tutor_rating = await tutor.getAverageRating();
            tutorClass.save()
-            .catch(error => res.status(404).send(error.message));
+            .catch(error => res.status(400).send(error.message));
        })
     })
-    .catch(error => res.status(404).send(error.message));
+    .catch(error => res.status(400).send(error.message));
 });
 
 //          B   O   O   K   I   N   G
@@ -134,10 +134,10 @@ router.get('/bookings', auth, (req, res) => {
          if(!booking) res.send('No booking requests yet.');
          res.send(booking);
       })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
-router.post('/book/:id',auth, (req, res) => {
+router.post('/booking/:id',auth, (req, res) => {
     Class.findById(req.params.id)
      .then(queried_class => {
          if(!queried_class) throw new Error('Class was not found.');
@@ -154,10 +154,10 @@ router.post('/book/:id',auth, (req, res) => {
           .then(booking => {
               res.send(booking);
           })
-          .catch(error => res.status(404).send(error.message));
+          .catch(error => res.status(400).send(error.message));
           
      })
-     .catch(error => res.status(404).send(error.message))
+     .catch(error => res.status(400).send(error.message))
 });
 
 router.put('/booking/:id', auth, (req, res) => {
@@ -168,6 +168,6 @@ router.put('/booking/:id', auth, (req, res) => {
         console.log(cancelledBooking);
         res.json(cancelledBooking);
    })
-    .catch(error => res.status(404).send(error.message));
+    .catch(error => res.status(400).send(error.message));
 })
 module.exports = router;

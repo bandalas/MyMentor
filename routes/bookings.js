@@ -29,7 +29,7 @@ router.get('/',auth, (req, res) => {
          if(!booking) res.send('No booking requests yet.');
          res.send(booking);
       })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 router.put('/accept/:id', auth, (req, res) => {
@@ -51,12 +51,12 @@ router.put('/accept/:id', auth, (req, res) => {
                 booking.save();
             });
          })
-         .catch(error => res.status(404).send(error.message));
+         .catch(error => res.status(400).send(error.message));
 
          notify_student(updated, 'Booking Accepted');
          res.send(updated);
      })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 router.put('/reject/:id', auth, (req, res) => {
@@ -67,7 +67,7 @@ router.put('/reject/:id', auth, (req, res) => {
          notify_student(updated, 'Booking Rejected');
          res.send(updated);
      })
-     .catch(error => res.status(404).send(error.message));
+     .catch(error => res.status(400).send(error.message));
 });
 
 module.exports = router;

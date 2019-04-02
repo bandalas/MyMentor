@@ -37,11 +37,11 @@ router.post('/signup', (req, res) => {
                 const token = admin.generateToken();
                 res.header('x-auth-token',token).send(admin);
             })
-             .catch(error => res.status(404).send(error.message));
+             .catch(error => res.status(400).send(error.message));
 
          });
     } catch(error) {
-        res.status(404).send(error.message);
+        res.status(400).send(error.message);
     }
 });
 
@@ -72,7 +72,7 @@ router.get('/reports', auth, (req, res) =>{
         console.log(reports)
         res.json(reports)
      })
-     .catch(error => res.json(404).send(error.message));
+     .catch(error => res.json(400).send(error.message));
 });
 
 module.exports = router;
