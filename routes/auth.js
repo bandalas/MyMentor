@@ -11,13 +11,15 @@ router.post('/', (req, res) => {
         // Checks if the tutor exists
         User.findOne({ email: req.body.email})
          .then((user)=> {
+             
              if(!user) return res.send(recordNotFound());
              // Checks if hashed password of the record matches input
              unhashPassword(req.body.password, user.password)
                 // Returns boolean of whether if the password was valid or not
               .then((validPassword) => {
-                  if(!validPassword) return res.status(400).send(error_invalid_msg);
-
+                  if(!validPassword){
+                    return res.send(recordNotFound());
+                  }
                   // Password matches, thus authentication should be performed
                   const token = user.generateToken();
                   const response_body = {
