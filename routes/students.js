@@ -18,6 +18,9 @@ const { hashPassword } = require('./../core/password-hasher');
 	1. Store Image
 */
 
+/*
+*   Creates a new Student and stores it
+*/
 router.post('/signup', (req, res) => {
     try {
         // Checks whether the body of the request is correct;
@@ -26,8 +29,7 @@ router.post('/signup', (req, res) => {
 
         hashPassword(req.body.password)
          .then(hashedPassword => {
-             // Creating a new instance of the model student and the
-             // hashed password
+             // Creating a new instance of the model student and the hashed password
             const student = new Student({
                 firstName: req.body.firstName,
                 lastName:  req.body.lastName,
@@ -41,42 +43,41 @@ router.post('/signup', (req, res) => {
             // Saving function, async function
             student.save()
              .then(student => {
-                console.log(student);
                 const token = student.generateToken();
                 res.header('x-auth-token', token).send(student);
             })
-             .catch(error => res.status(400).send(error.message));
-
+             .catch(error => res.status(404).send(error.message));
          });
     } catch(error) {
         res.status(400).send(error.message);
     }
 });
 
-// auth is the middleware function that verifies that the user is logged in
-router.get('/dashboard', auth, (req, res) => {
-    res.send('Welcome ' + req.student.name +' ! id: '+ req.student._id);
-
-});
-
+/*
+*   Fetching mentors sorted by their star ranking
+*/
 router.get('/mentors', auth, (req, res) => {
 Tutor.find().sort({stars: 1})
      .then(mentors => {
-        console.log(mentors)
         res.json(mentors)
      })
      .catch(error => res.status(400).send(error.message));
 });
 
+/*
+*   Fetching all available classes
+*/
 router.get('/classes',auth, (req, res) => {
     Class.find({ availability: true })
      .then(classes => {
-        console.log(classes)
         res.json(classes)
      })
      .catch(error => res.status(400).send(error.message));
 });
 
+/*
+*   Fetching all new available classes, sorted by newest
+*/
 router.get('/new-classes', auth, (req, res) => {
     Class.find({availability: true})
      .hint({$natural:-1})
@@ -86,6 +87,9 @@ router.get('/new-classes', auth, (req, res) => {
      .catch(error => res.status(400).send(error.message));
 });
 
+/*
+*   Registering a new review
+*/
 router.post('/new-review/:id', auth, (req, res) =>{
     //Check first the input of the user
     var { error } = postReview(req.body);
@@ -123,21 +127,12 @@ router.post('/new-review/:id', auth, (req, res) =>{
 });
 
 //          B   O   O   K   I   N   G
-router.get('/bookings', auth, (req, res) => {
-    const student_id = req.student._id
-    Booking.find({
-        student : student_id,
-        status: 'Pending'
-    })
-     .sort({ date:1 })
-     .then((booking) => {
-         if(!booking) res.send('No booking requests yet.');
-         res.send(booking);
-      })
-     .catch(error => res.status(400).send(error.message));
-});
 
-router.post('/booking/:id',auth, (req, res) => {
+
+/*
+*   Student creates a new class booking
+*/
+router.post('/book/:id',auth, (req, res) => {
     Class.findById(req.params.id)
      .then(queried_class => {
          if(!queried_class) throw new Error('Class was not found.');
@@ -160,6 +155,9 @@ router.post('/booking/:id',auth, (req, res) => {
      .catch(error => res.status(400).send(error.message))
 });
 
+/*
+*   Cancels a student class booking
+*/
 router.put('/booking/:id', auth, (req, res) => {
     Booking.findByIdAndUpdate(req.params.id, {
         status: 'Cancelled'
@@ -170,4 +168,5 @@ router.put('/booking/:id', auth, (req, res) => {
    })
     .catch(error => res.status(400).send(error.message));
 })
+
 module.exports = router;

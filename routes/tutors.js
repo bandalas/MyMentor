@@ -13,8 +13,11 @@ const { hashPassword } = require('./../core/password-hasher');
 
 /*
     TODO: 
-    2. Modify Joi schema for only accepting categories given an array
     3. Store Image
+*/
+
+/*
+*       Creates a Tutor and stores it in the database
 */
 router.post('/signup', (req, res) => {
     try {
@@ -54,24 +57,21 @@ router.post('/signup', (req, res) => {
     }
 });
 
-// auth is the middleware function that verifies that the user is logged in
-router.get('/dashboard', auth, (req, res) => {
-    res.send('Welcome ' + req.tutor.name +' ! id: '+ req.tutor._id);
 
-});
-
-
-//      CLASSES FUNCTIONS
+/*
+*       Fetches all available classes from the tutor given an id
+*/
 router.get('/classes', auth, (req, res) => {
     Class.find({ tutor: req.tutor._id, availability: true})
      .then(classes => {
-        console.log(classes)
         res.json(classes)
      })
      .catch(error => res.json(400).send(error.message));
 });
 
-
+/*
+*       Creates a new class for a tutor, given its id 
+*/
 router.post('/class', auth, (req, res) => {
     var { error } = classValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -99,6 +99,23 @@ router.post('/class', auth, (req, res) => {
      })
 });
 
+
+/*
+*       Bulk fetch of classes by ids
+*/
+router.get('/class', auth, (req, res) => {
+    const ids = req.query.ids
+    Class.find({
+        "_id":{ "$in" : ids }
+    })
+        .then(data => {
+            res.send(data);
+        })
+        .catch(error => res.status(404).send(error));
+});
+/*
+*       Cancels a class given the class id
+*/
 router.put('/cancel-class/:id', auth, (req, res) => {
     Class.findByIdAndUpdate(req.params.id, {
         availability: false
@@ -150,7 +167,7 @@ router.post('/report-review/:id', auth, (req, res) =>{
         })
          .catch(error => res.status(400).send(error.message));
     })
-    .catch(error => res.status(400).send(error.message));
+    .catch(error => res.status(404).send(error.message));
 });
 
 //Date Filter
@@ -166,4 +183,5 @@ router.get('/search/classes', auth, (req, res) => {
      })
      .catch(error => res.status(400).send(error.message));
 });
+
 module.exports = router;

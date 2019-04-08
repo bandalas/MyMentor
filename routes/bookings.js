@@ -17,7 +17,11 @@ function notify_student(booking, booking_status) {
     })
     .catch(error => console.log('Couldnt notify student ' + error.message));
 }
+/*
+*       Fetching bookings
+*/
 
+//      Pending bookings
 router.get('/',auth, (req, res) => {
     const tutor_id = req.tutor._id
     Booking.find({
@@ -30,6 +34,36 @@ router.get('/',auth, (req, res) => {
          res.send(booking);
       })
      .catch(error => res.status(400).send(error.message));
+});
+
+//      Accepted bookings
+router.get('/accepted', auth, (req, res) => {
+    const tutor_id = req.tutor._id
+    Booking.find({
+        tutor : tutor_id,
+        status: 'Accepted'
+    })
+     .sort({ date:1 })
+     .then((booking) => {
+        if(!booking) res.send({no_bookings: true});
+        res.send(booking);
+      })
+     .catch(error => res.status(404).send(error.message));
+});
+
+//      Cancelled bookings
+router.get('/cancelled', auth, (req, res) => {
+    const tutor_id = req.tutor._id
+    Booking.find({
+        tutor : tutor_id,
+        status: 'Cancelled'
+    })
+     .sort({ date:1 })
+     .then((booking) => {
+        if(!booking) res.send({no_bookings: true});
+        res.send(booking);
+      })
+     .catch(error => res.status(404).send(error.message));
 });
 
 router.put('/accept/:id', auth, (req, res) => {
