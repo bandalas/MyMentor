@@ -17,9 +17,8 @@ router.post('/', (req, res) => {
              unhashPassword(req.body.password, user.password)
                 // Returns boolean of whether if the password was valid or not
               .then((validPassword) => {
-                  if(!validPassword){
-                    return res.send(recordNotFound());
-                  }
+                  if(!validPassword) return res.send(recordNotFound());
+
                   // Password matches, thus authentication should be performed
                   const token = user.generateToken();
                   const response_body = {
@@ -30,12 +29,12 @@ router.post('/', (req, res) => {
                   res.send(response_body);
               })
               .catch((error) => {
-                  res.status(400).send(error.message);
+                  return res.send(recordNotFound());
               });
          })
          // No record was found with the given email
          .catch((error) => {
-             res.status(400).send(error.message);
+             return res.send(recordNotFound());
          });
 
     } catch(error) {

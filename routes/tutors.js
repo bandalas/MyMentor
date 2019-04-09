@@ -49,7 +49,7 @@ router.post('/signup', (req, res) => {
                 const token = tutor.generateToken();
                 res.header('x-auth-token',token).send(tutor);
             })
-             .catch(error => res.status(400).send(error.message));
+             .catch(error => res.status(401).send(error.message));
 
          });
     } catch(error) {

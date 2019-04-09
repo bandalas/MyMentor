@@ -3,19 +3,20 @@ const router = express.Router();
 
 const Class = require('./../model/class');
 
-router.get('/class', (req, res) => {
-    var search_params = {}
+router.post('/class', (req, res) => {
+    var search_params = { availability: true }
+
     if(req.body.name) {
-        search_params.name = req.body.name
+        search_params.name = { $regex: req.body.name }
     }
     if(req.body.area) {
-        search_params.area = req.body.area
+        search_params.area = { $regex: req.body.area}
     }
     if(req.body.subject) {
-        search_params.subject = req.body.subject
+        search_params.subject = { $regex: req.body.subject }
     }
     if(req.body.cost) {
-        search_params.cost = { $lte: req.body.cost }
+        search_params.cost = { $lte: parseFloat(req.body.cost) }
     }
     if(req.body.average) {
         search_params.tutor_rating = { $gte: req.body.average }
