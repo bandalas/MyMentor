@@ -3,8 +3,8 @@ const options = { discriminatorKey: 'usertype' };
 const jwt = require('jsonwebtoken');
 
 var userSchema = new mongoose.Schema({
-    firstName: { type: String, required: true, minlength: 3, maxlength: 100 },
-    lastName: { type: String, required: true, minlength: 3, maxlength: 100 },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true},
 }, options);

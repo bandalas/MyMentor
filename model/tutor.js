@@ -7,16 +7,14 @@ const mongoose = require('mongoose');
 const Review = require('./review');
 const User = require('./user');
 
-const category_options = [ 'Lenguas', 'Ciencias' ];
-
 // Tutor inherits everything from User and adds the following for the schema:
 var tutorSchema = new mongoose.Schema({
     institution: { type: String, required: true },
     stars: { type: Number, default: 0 },
     semester: { type: Number, required: true },
-    img: { type: String, data: Buffer, required: true },
+    img: { data: Buffer, contentType: String},
     description: { type: String , required: true },
-    category: { type: String, enum: category_options },
+    category: { type: String },
     gpa: { type: Number, required: true }
 });
 
