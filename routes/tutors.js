@@ -1,55 +1,65 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const multer = require('multer');
 
 const auth = require('../middleware/tutor-auth');
 const Tutor = require('./../model/tutor');
 const Class = require('./../model/class');
 const Review = require('./../model/review');
 const Report = require('./../model/report');
-const Booking = require('./../model/booking');
 
 const { postValidation, classValidation, reportValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
-/*
-    TODO: 
-    3. Store Image
-*/
-
-/*
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
 *       Creates a Tutor and stores it in the database
-*/
-router.post('/signup', (req, res) => {
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+
+//  Constants for image storage
+const storage = multer.diskStorage({
+    destination: function (req, res, cb) {
+        cb(null, './uploads/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now())
+    }
+});
+const upload = multer({ storage: storage });
+
+router.post('/signup', upload.single('img'),  (req, res) => {
+    
     try {
-        // Checks whether the body of the request is correct;
-        var { error } = postValidation(req.body);
-        if (error) throw new Error(error.details[0].message);
-
         hashPassword(req.body.password)
+         // We have to hash the password first
          .then(hashedPassword => {
-             // Creating a new instance of the model tutor and the
-             // hashed password
-            const tutor = new Tutor({
-                firstName: req.body.firstName,
-                lastName:  req.body.lastName,
-                email: req.body.email,
-                password: hashedPassword,
-                institution: req.body.institution,
-                semester:  req.body.semester,
-                img: req.body.img,
-                description: req.body.description,
-                category: req.body.category,
-                gpa: req.body.gpa
-            });
-
+            
+             // Creating a new instance of the model tutor and the hashed password
+            const tutor = new Tutor;
+            tutor.firstName = req.body.firstName;
+            tutor.lastName =  req.body.lastName;
+            tutor.email = req.body.email;
+            tutor.password = hashedPassword;
+            tutor.institution = req.body.institution;
+            tutor.semester =  req.body.semester;
+            tutor.description = req.body.description;
+            tutor.category =  req.body.category;
+            tutor.gpa = req.body.gpa;
+            // Image data
+            tutor.img.data = fs.readFileSync(req.file.path);
+            tutor.img.contentType = 'image/jpeg';
             // Saving function, async function
             tutor.save()
              .then(tutor => {
-                console.log(tutor);
                 const token = tutor.generateToken();
                 res.header('x-auth-token',token).send(tutor);
             })
-             .catch(error => res.status(401).send(error.message));
+             .catch(error => {
+                 console.log(error);
+                 res.status(400).send(error.message)
+                });
 
          });
     } catch(error) {
@@ -58,9 +68,31 @@ router.post('/signup', (req, res) => {
 });
 
 
-/*
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Checks if an email is in use
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+//  No need for middleware
+router.post('/email', (req, res) => {
+    Tutor.find({
+        email: req.body.tutor_email
+    })
+     .then(record => {
+         // We want to know whether the record was found or not
+         if(record.length > 0) return res.send({found: true});
+         res.send({found: false});
+     })
+     .catch(error => {
+         console.log(error.message);
+     });
+});
+
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
 *       Fetches all available classes from the tutor given an id
-*/
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.get('/classes', auth, (req, res) => {
     Class.find({ tutor: req.tutor._id, availability: true})
      .then(classes => {
