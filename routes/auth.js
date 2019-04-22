@@ -24,7 +24,8 @@ router.post('/', (req, res) => {
                   const response_body = {
                       'token': token,
                       'user': user,
-                      'type': user.usertype
+                      'type': user.usertype,
+                      '_id': user._id
                   }
                   res.send(response_body);
               })
