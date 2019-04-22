@@ -8,7 +8,11 @@ const Class = require('./../model/class');
 const Review = require('./../model/review');
 const Booking = require('./../model/booking');
 
-const { postValidation } = require('./../core/validators/student-validator');
+const crypto = require('crypto');
+const email = 'EMAIL';
+const password = 'PASSWORD';
+const nodemailer = require('nodemailer');
+
 const { postReview } = require('./../core/validators/review-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
@@ -71,6 +75,88 @@ router.post('/email', (req, res) => {
      .catch(error => {
          console.log(error.message);
      });
+});
+
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Email sender for forgotten password
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+
+const smtpTransport = nodemailer.createTransport({
+    service: process.env.MAILER_SERVICE_PROVIDER || 'Gmail',
+    auth: {
+      user: email,
+      pass: password
+    }
+  });
+  
+router.post('/forgot-password', (req, res) => {
+    Student.findOne({
+        email: req.body.email
+    })
+     .then( user => {
+        crypto.randomBytes(20, (err, buffer) => {
+            var token = buffer.toString('hex');
+            Student.findByIdAndUpdate({_id: user._id }, 
+                { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, 
+                { upsert: true, new: true }
+            ).then(new_user => {
+                const url_token = 'http://localhost:3001/students/reset_password?token=' + token;
+                var data = {
+                    to: new_user.email,
+                    from: email,
+                    template: 'forgot-password-email',
+                    subject: 'Password help has arrived!',
+                    text: "Hello "+new_user.firstName+", reset link: " +url_token,
+                };
+                smtpTransport.sendMail(data, err => {
+                    if (!err) {
+                      return res.json({ message: 'Kindly check your email for further instructions' });
+                    }
+                });
+            })
+        })
+     })
+     .catch( error => {
+         console.log(error);
+         res.status(404).send(error.message);
+     })
+});
+
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Password reset
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+
+router.post('/reset_password', (req, res) => {
+    const token = req.query.token;
+    Student.findOne({
+        reset_password_token: req.query.token,
+        reset_password_expires: {
+          $gt: Date.now()
+        }
+    })
+     .then(user => {
+         console.log(user);
+         if(user) {
+             hashPassword(req.body.password)
+              .then( hashed => {
+                user.hash_password = hashed;
+                user.reset_password_token = undefined;
+                user.reset_password_expires = undefined;
+                user.save()
+                 .then( saved => {
+                     console.log(saved);
+                     res.send({success: true});
+                 })
+              })
+        }
+     })
+     .catch(error => {
+         res.status(404).send(error.message);
+     })
 });
 
 /*

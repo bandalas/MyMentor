@@ -7,6 +7,8 @@ var userSchema = new mongoose.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true},
+    reset_password_token: { type: String },
+    reset_password_expires: { type: Date }
 }, options);
 
 userSchema.methods.generateToken = function() {
