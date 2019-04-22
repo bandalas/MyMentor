@@ -9,7 +9,7 @@ const Class = require('./../model/class');
 const Review = require('./../model/review');
 const Report = require('./../model/report');
 
-const { postValidation, classValidation, reportValidation } = require('./../core/validators/tutor-validator');
+const { classValidation, reportValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
@@ -17,7 +17,6 @@ const { hashPassword } = require('./../core/password-hasher');
 *       Creates a Tutor and stores it in the database
 *
 *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
-
 //  Constants for image storage
 const storage = multer.diskStorage({
     destination: function (req, res, cb) {
@@ -101,14 +100,13 @@ router.get('/classes', auth, (req, res) => {
      .catch(error => res.json(400).send(error.message));
 });
 
-/*
-*       Creates a new class for a tutor, given its id 
-*/
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*        Creates a new class for a tutor, given the tutor's id 
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.post('/class', auth, (req, res) => {
-    var { error } = classValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
-    Tutor.findOne({ _id: req.tutor._id })
+     Tutor.findOne({ _id: req.tutor._id })
      .then( async tutor => {
          const newClass = new Class({
              tutor: req.tutor._id,
@@ -127,10 +125,8 @@ router.post('/class', auth, (req, res) => {
              res.json(newClass);
          })
           .catch(error => res.status(400).send(error.message));
-        
      })
 });
-
 
 /*
 *       Bulk fetch of classes by ids
@@ -145,10 +141,14 @@ router.get('/class', auth, (req, res) => {
         })
         .catch(error => res.status(404).send(error));
 });
-/*
-*       Cancels a class given the class id
-*/
+
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*        Cancels a class given the class id
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.put('/cancel-class/:id', auth, (req, res) => {
+    console.log(req);
     Class.findByIdAndUpdate(req.params.id, {
         availability: false
     }, { new: true })

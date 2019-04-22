@@ -12,21 +12,18 @@ const { postValidation } = require('./../core/validators/student-validator');
 const { postReview } = require('./../core/validators/review-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
-
 /*
 	TODO:
 	1. Store Image
 */
-
-/*
-*   Creates a new Student and stores it
-*/
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Creates a Student and stores it in the database
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.post('/signup', (req, res) => {
     try {
-        // Checks whether the body of the request is correct;
-        var { error } = postValidation(req.body);
-        if (error) throw new Error(error.details[0].message);
-
+        console.log(req.body);
         hashPassword(req.body.password)
          .then(hashedPassword => {
              // Creating a new instance of the model student and the hashed password
@@ -37,20 +34,43 @@ router.post('/signup', (req, res) => {
                 password: hashedPassword,
                 institution: req.body.institution,
                 semester:  req.body.semester,
-                img: req.body.img
             });
-
             // Saving function, async function
             student.save()
              .then(student => {
                 const token = student.generateToken();
-                res.header('x-auth-token', token).send(student);
+                res.header('x-auth-token', token).send({
+                    success : 'true'
+                });
             })
-             .catch(error => res.status(404).send(error.message));
+             .catch(error => res.send({
+                 success: false,
+                 error: error.message
+             }));
          });
     } catch(error) {
         res.status(400).send(error.message);
     }
+});
+
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Checks if an email is in use
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+//  No need for middleware
+router.post('/email', (req, res) => {
+    Student.find({
+        email: req.body.tutor_email
+    })
+     .then(record => {
+         // We want to know whether the record was found or not
+         if(record.length > 0) return res.send({found: true});
+         res.send({found: false});
+     })
+     .catch(error => {
+         console.log(error.message);
+     });
 });
 
 /*
