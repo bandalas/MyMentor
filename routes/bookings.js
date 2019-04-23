@@ -104,4 +104,15 @@ router.put('/reject/:id', auth, (req, res) => {
      .catch(error => res.status(400).send(error.message));
 });
 
+router.put('/cancel/:id', auth, (req, res) => {
+    Booking.findByIdAndUpdate(req.params.id, {
+        status: 'Cancelled'
+    }, {new : true})
+     .then(updated => {
+         notify_student(updated, 'Booking Cancelled');
+         res.send(updated);
+     })
+     .catch(error => res.status(400).send(error.message));
+});
+
 module.exports = router;
