@@ -24,7 +24,9 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    exposedHeaders: ['X-Total-Count']
+}));
 app.options('*', cors());
 app.use('/tutors/', tutors);
 app.use('/students/', students);
