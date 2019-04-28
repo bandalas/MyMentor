@@ -24,10 +24,13 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
+
+// Header for Admin Dashboard
 app.use(cors({
     exposedHeaders: ['X-Total-Count']
 }));
 app.options('*', cors());
+
 app.use('/tutors/', tutors);
 app.use('/students/', students);
 app.use('/students/notifications', notifications);
