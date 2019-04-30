@@ -178,6 +178,15 @@ router.put('/class/:id', auth, (req, res) => {
      })
      .catch(error => res.status(400).send(error.message));
 });
+// R E V I E W S 
+
+    router.get('/reviews', auth, (req, res) => {
+    Review.find({ tutor: req.tutor._id   })
+     .then(reviews => {
+        res.json(reviews)
+     })
+     .catch(error => res.json(400).send(error.message));
+});
 
 //          R  E  P  O  R  T  S
 router.post('/report-review/:id', auth, (req, res) =>{
