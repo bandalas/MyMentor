@@ -100,6 +100,17 @@ router.get('/classes', auth, (req, res) => {
      .catch(error => res.json(400).send(error.message));
 });
 
+
+
+router.get('/userinfo', auth, (req, res) => {
+Tutor.find({  _id: req.tutor._id})
+     .then(userinfo => {
+        res.json(userinfo)
+     })
+     .catch(error => res.status(400).send(error.message));
+});
+
+
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
 *
 *        Creates a new class for a tutor, given the tutor's id 
