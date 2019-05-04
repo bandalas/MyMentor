@@ -9,8 +9,8 @@ const Review = require('./../model/review');
 const Booking = require('./../model/booking');
 
 const crypto = require('crypto');
-const email = 'EMAIL';
-const password = 'PASSWORD';
+const email = 'mymentormx@gmail.com';
+const password = 'mymentorbrandon#';
 const nodemailer = require('nodemailer');
 
 const { postReview } = require('./../core/validators/review-validator');
@@ -96,31 +96,35 @@ router.post('/forgot-password', (req, res) => {
         email: req.body.email
     })
      .then( user => {
-        crypto.randomBytes(20, (err, buffer) => {
-            var token = buffer.toString('hex');
-            Student.findByIdAndUpdate({_id: user._id }, 
-                { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, 
-                { upsert: true, new: true }
-            ).then(new_user => {
-                const url_token = 'http://localhost:3001/students/reset_password?token=' + token;
-                var data = {
-                    to: new_user.email,
-                    from: email,
-                    template: 'forgot-password-email',
-                    subject: 'Password help has arrived!',
-                    text: "Hello "+new_user.firstName+", reset link: " +url_token,
-                };
-                smtpTransport.sendMail(data, err => {
-                    if (!err) {
-                      return res.json({ message: 'Kindly check your email for further instructions' });
-                    }
-                });
-            })
-        })
+        if( user ) {
+            crypto.randomBytes(20, (err, buffer) => {
+                var token = buffer.toString('hex');
+                Student.findByIdAndUpdate({_id: user._id }, 
+                    { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, 
+                    { upsert: true, new: true }
+                ).then(new_user => {
+                    const url_token = 'http://localhost:3000/reset_password/reset?token=' + token;
+                    var data = {
+                        to: new_user.email,
+                        from: email,
+                        template: 'forgot-password-email',
+                        subject: 'Password help has arrived!',
+                        text: "Hello "+new_user.firstName+", reset link: " +url_token,
+                    };
+                    smtpTransport.sendMail(data, err => {
+                        if (!err) {
+                          return res.json({ success: true });
+                        }
+                        else {
+                            return res.json({ success: false});
+                        }
+                    });
+                })
+            })   
+        }
      })
      .catch( error => {
-         console.log(error);
-         res.status(404).send(error.message);
+         return res.json({ success: false});
      })
 });
 
@@ -131,15 +135,14 @@ router.post('/forgot-password', (req, res) => {
 *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 
 router.post('/reset_password', (req, res) => {
-    const token = req.query.token;
+    const token = req.body.token;
     Student.findOne({
-        reset_password_token: req.query.token,
+        reset_password_token: token,
         reset_password_expires: {
           $gt: Date.now()
         }
     })
      .then(user => {
-         console.log(user);
          if(user) {
              hashPassword(req.body.password)
               .then( hashed => {
@@ -148,14 +151,16 @@ router.post('/reset_password', (req, res) => {
                 user.reset_password_expires = undefined;
                 user.save()
                  .then( saved => {
-                     console.log(saved);
                      res.send({success: true});
                  })
               })
         }
+        else {
+            res.send({success: false});
+        }
      })
      .catch(error => {
-         res.status(404).send(error.message);
+        res.send({success: false});
      })
 });
 
