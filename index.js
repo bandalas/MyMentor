@@ -16,7 +16,7 @@ const searches = require('./routes/searches');
 const api = require('./routes/api');
 
 // Setting up db connection
-mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
+mongoose.connect('mongodb://admin:hola123@ds153096.mlab.com:53096/mymentor', {useNewUrlParser: true})
  .then(()=> {console.log('Successfully connected to the MyMentor database');})
  .catch((err)=> {console.log('Failed to connect with error: ', err.message);});
 
