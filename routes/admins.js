@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const Review = require('./../model/review');
 const auth = require('../middleware/admin-auth');
 const dashboard = require('./dashboard');
 
@@ -44,6 +44,29 @@ router.post('/signup', (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
+
+router.put('/new-review/:id', auth, (req, res) => {
+    Review.findOneAndUpdate(req.params.id, {comment: "COMENTARIO ESCONDIDO DADO A INCUMPLIMIENTO CON TERMINOS DE SERVICIO"}, { new: true })
+     .then(censoredReview => {
+        console.log(censoredReview);
+        res.json(censoredReview);
+   })
+    .catch(error => res.status(400).send(error.message));
+})
+
+
+
+router.delete('/new-review/:id', auth, (req, res) => {
+    Review.findOneAndDelete({_id: req.params.id})
+     .then(censoredReview => {
+        console.log(censoredReview);
+        res.json(censoredReview);
+   })
+    .catch(error => res.status(400).send(error.message));
+})
+
+
 
 // auth is the middleware function that verifies that the user is logged in
 router.get('/dashboard', auth, (req, res) => {
