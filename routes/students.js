@@ -103,7 +103,7 @@ router.post('/forgot-password', (req, res) => {
                     { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, 
                     { upsert: true, new: true }
                 ).then(new_user => {
-                    const url_token = 'http://localhost:3000/reset_password/reset?token=' + token;
+                    const url_token = 'https://young-fortress-54541.herokuapp.com/reset_password/reset?token=' + token;
                     var data = {
                         to: new_user.email,
                         from: email,
