@@ -139,9 +139,11 @@ router.post('/class', auth, (req, res) => {
      })
 });
 
-/*
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
 *       Bulk fetch of classes by ids
-*/
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.get('/class', auth, (req, res) => {
     const ids = req.query.ids
     Class.find({
