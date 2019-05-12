@@ -12,6 +12,7 @@ const Report = require('./../model/report');
 const { classValidation, reportValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
 
+
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
 *
 *       Creates a Tutor and stores it in the database
@@ -34,7 +35,6 @@ router.post('/signup', upload.single('img'),  (req, res) => {
         hashPassword(req.body.password)
          // We have to hash the password first
          .then(hashedPassword => {
-            
              // Creating a new instance of the model tutor and the hashed password
             const tutor = new Tutor;
             tutor.firstName = req.body.firstName;

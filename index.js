@@ -13,6 +13,7 @@ const bookings = require('./routes/bookings');
 const admins = require('./routes/admins');
 const notifications = require('./routes/notifications');
 const searches = require('./routes/searches');
+const api = require('./routes/api');
 
 // Setting up db connection
 mongoose.connect('mongodb://localhost/mymentor', {useNewUrlParser: true})
@@ -38,6 +39,7 @@ app.use('/auth/', auth);
 app.use('/tutors/bookings', bookings);
 app.use('/admins/', admins);
 app.use('/search/', searches);
+app.use('/api/', api);
 
 const port = process.env.PORT || 3001;
 app.listen(port,() => {
