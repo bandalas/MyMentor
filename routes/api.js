@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Tutor = require('./../model/tutor');
-
+var ObjectId = require('mongodb').ObjectID;
 
 const Class = require('./../model/class');
 
@@ -34,23 +34,35 @@ router.post('/class', (req, res) => {
 
     Class.find(search_params)
      .then(matches => {
-         let result = []
+        let data = []
+         var count = 0;
          matches.forEach((elem) => {
-             const id = elem._id;
-             Tutor.findOne({ "_id": id})
-              .then(t => {
-                  matches.tutor = t.firstName +" " + t.lastName;
+             const id = elem.tutor;
+             Tutor.findOne({ _id: ObjectId(id)})
+              .then(tutor => {
+                  if(tutor) {
+                    let values = {
+                        name: elem.name,
+                        subject: elem.subject,
+                        cost: elem.cost,
+                        tutor: tutor.firstName +" " + tutor.lastName
+                    }
+                    data.push(values);
+                    count++;
+                    if(count == matches.length) {
+                        res.json(data);
+                    }
+                  }
               })
               .catch(e => {
                   console.log(e);
               })
          })
-         res.json(matches);
      })
      .catch(error => {
          console.log(error);
          res.status(404).send(error.message)
-        })
+      });
 });
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
 *

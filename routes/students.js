@@ -244,10 +244,11 @@ router.post('/new-review/:id', auth, (req, res) =>{
 *   Student creates a new class booking
 */
 router.post('/book/:id',auth, (req, res) => {
+    console.log('rip');
+    console.log(req);
     Class.findById(req.params.id)
      .then(queried_class => {
-         if(!queried_class) throw new Error('Class was not found.');
-         
+         console.log(queried_class)
          const student_id = req.student._id;
          const tutor_id = queried_class.tutor
          const booking = new Booking({
@@ -263,7 +264,10 @@ router.post('/book/:id',auth, (req, res) => {
           .catch(error => res.status(400).send(error.message));
           
      })
-     .catch(error => res.status(400).send(error.message))
+     .catch(error => { 
+         res.status(400).send(error.message)
+         //console.log(error);
+    })
 });
 
 /*

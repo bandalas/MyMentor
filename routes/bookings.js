@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
+var ObjectId = require('mongodb').ObjectID;
 
 const auth = require('../middleware/tutor-auth');
 const Booking = require('./../model/booking');
 const Notification = require('./../model/notification');
+const Class = require('../model/class');
+const Student = require('../model/student');
 
 function notify_student(booking, booking_status) {
     const notification = new Notification({
@@ -17,10 +20,12 @@ function notify_student(booking, booking_status) {
     })
     .catch(error => console.log('Couldnt notify student ' + error.message));
 }
-/*
-*       Fetching bookings
-*/
 
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Fetches all bookings
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 //      Pending bookings
 router.get('/',auth, (req, res) => {
     const tutor_id = req.tutor._id
@@ -29,13 +34,42 @@ router.get('/',auth, (req, res) => {
         status: 'Pending'
     })
      .sort({ date:1 })
-     .then((booking) => {
-         if(!booking) res.send('No booking requests yet.');
-         res.send(booking);
+     .then((bookings) => {
+        let data = []
+        let count = 0;
+        bookings.forEach(b => {
+            var c_id = b.booked_class;
+            var s_id = b.student;
+
+            Class.findOne({ _id : ObjectId(c_id)})
+                .then( c => {
+                    var c_name = c.name;
+                    var c_date = c.date;
+
+                    Student.findOne({ _id : ObjectId(s_id)})
+                    .then(s => {
+                        if(s) {
+                            var s_name = s.firstName + " " + s.lastName;
+                            let response = {
+                                student: s_name,
+                                class: c_name,
+                                date: c_date,
+                                _id: b._id,
+                                status: b.status
+                            }
+                            console.log(response)
+                            data.push(response);
+                            count++;
+                            if(count == bookings.length) {
+                                res.json(data)
+                            }
+                        }
+                    })
+                })
+        });
       })
      .catch(error => res.status(400).send(error.message));
 });
-
 //      Accepted bookings
 router.get('/accepted', auth, (req, res) => {
     const tutor_id = req.tutor._id
@@ -44,13 +78,42 @@ router.get('/accepted', auth, (req, res) => {
         status: 'Accepted'
     })
      .sort({ date:1 })
-     .then((booking) => {
-        if(!booking) res.send({no_bookings: true});
-        res.send(booking);
+     .then((bookings) => {
+        let data = []
+        let count = 0;
+        bookings.forEach(b => {
+            var c_id = b.booked_class;
+            var s_id = b.student;
+
+            Class.findOne({ _id : ObjectId(c_id)})
+                .then( c => {
+                    var c_name = c.name;
+                    var c_date = c.date;
+
+                    Student.findOne({ _id : ObjectId(s_id)})
+                    .then(s => {
+                        if(s) {
+                            var s_name = s.firstName + " " + s.lastName;
+                            let response = {
+                                student: s_name,
+                                class: c_name,
+                                date: c_date,
+                                _id: b._id,
+                                status: b.status
+                            }
+                            console.log(response)
+                            data.push(response);
+                            count++;
+                            if(count == bookings.length) {
+                                res.json(data)
+                            }
+                        }
+                    })
+                })
+        });
       })
      .catch(error => res.status(404).send(error.message));
 });
-
 //      Cancelled bookings
 router.get('/cancelled', auth, (req, res) => {
     const tutor_id = req.tutor._id
@@ -59,13 +122,49 @@ router.get('/cancelled', auth, (req, res) => {
         status: 'Cancelled'
     })
      .sort({ date:1 })
-     .then((booking) => {
-        if(!booking) res.send({no_bookings: true});
-        res.send(booking);
+     .then((bookings) => {
+        let data = []
+        let count = 0;
+        bookings.forEach(b => {
+            var c_id = b.booked_class;
+            var s_id = b.student;
+
+            Class.findOne({ _id : ObjectId(c_id)})
+                .then( c => {
+                    var c_name = c.name;
+                    var c_date = c.date;
+
+                    Student.findOne({ _id : ObjectId(s_id)})
+                    .then(s => {
+                        if(s) {
+                            var s_name = s.firstName + " " + s.lastName;
+                            let response = {
+                                student: s_name,
+                                class: c_name,
+                                date: c_date,
+                                _id: b._id,
+                                status: b.status
+                            }
+                            console.log(response)
+                            data.push(response);
+                            count++;
+                            if(count == bookings.length) {
+                                res.json(data)
+                            }
+                        }
+                    })
+                })
+        });
       })
      .catch(error => res.status(404).send(error.message));
 });
 
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Functions that handle all booking actions
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+//      Accepts a booking
 router.put('/accept/:id', auth, (req, res) => {
     Booking.findByIdAndUpdate(req.params.id, {
         status: 'Accepted'
@@ -92,7 +191,7 @@ router.put('/accept/:id', auth, (req, res) => {
      })
      .catch(error => res.status(400).send(error.message));
 });
-
+//      Rejects a booking
 router.put('/reject/:id', auth, (req, res) => {
     Booking.findByIdAndUpdate(req.params.id, {
         status: 'Rejected'
@@ -103,7 +202,7 @@ router.put('/reject/:id', auth, (req, res) => {
      })
      .catch(error => res.status(400).send(error.message));
 });
-
+//      Cancels a booking
 router.put('/cancel/:id', auth, (req, res) => {
     Booking.findByIdAndUpdate(req.params.id, {
         status: 'Cancelled'
