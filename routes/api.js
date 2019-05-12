@@ -34,9 +34,23 @@ router.post('/class', (req, res) => {
 
     Class.find(search_params)
      .then(matches => {
-        res.json(matches);
+         let result = []
+         matches.forEach((elem) => {
+             const id = elem._id;
+             Tutor.findOne({ "_id": id})
+              .then(t => {
+                  matches.tutor = t.firstName +" " + t.lastName;
+              })
+              .catch(e => {
+                  console.log(e);
+              })
+         })
+         res.json(matches);
      })
-     .catch(error => res.status(404).send(error.message))
+     .catch(error => {
+         console.log(error);
+         res.status(404).send(error.message)
+        })
 });
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
 *
