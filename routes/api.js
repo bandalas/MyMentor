@@ -58,6 +58,7 @@ router.post('/class', (req, res) => {
                   console.log(e);
               })
          })
+         if(matches.length === 0) res.json(data);
      })
      .catch(error => {
          console.log(error);
