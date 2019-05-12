@@ -56,7 +56,6 @@ router.post('/signup', upload.single('img'),  (req, res) => {
                 res.header('x-auth-token',token).send(tutor);
             })
              .catch(error => {
-                 console.log(error);
                  res.status(400).send(error.message)
                 });
 
@@ -83,7 +82,7 @@ router.post('/email', (req, res) => {
          res.send({found: false});
      })
      .catch(error => {
-         console.log(error.message);
+         res.status(404).send(error);
      });
 });
 
@@ -132,7 +131,6 @@ router.post('/class', auth, (req, res) => {
 
          newClass.save()
           .then(newClass => {
-             console.log(newClass);
              res.json(newClass);
          })
           .catch(error => res.status(400).send(error.message));
@@ -161,12 +159,10 @@ router.get('/class', auth, (req, res) => {
 *
 *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.put('/cancel-class/:id', auth, (req, res) => {
-    console.log(req);
     Class.findByIdAndUpdate(req.params.id, {
         availability: false
     }, { new: true })
      .then(canceledClass => {
-        console.log(canceledClass);
         res.json(canceledClass);
     })
      .catch(error => res.status(400).send(error.message));
@@ -186,7 +182,6 @@ router.put('/class/:id', auth, (req, res) => {
         cost: req.body.cost
     }, { new: true })
      .then(updatedClass => {
-        console.log(updatedClass);
         res.json(updatedClass);
      })
      .catch(error => res.status(400).send(error.message));
@@ -216,7 +211,6 @@ router.post('/report-review/:id', auth, (req, res) =>{
 
         report.save()
          .then(review => {
-            console.log(report);
             res.json(report);
         })
          .catch(error => res.status(400).send(error.message));
@@ -232,7 +226,6 @@ router.get('/search/classes', auth, (req, res) => {
             $lt: req.body.endDate
         }})
     .then(matches => {
-        console.log(matches);
         res.json(matches);
      })
      .catch(error => res.status(400).send(error.message));
