@@ -46,10 +46,9 @@ router.post('/class', (req, res) => {
 router.get('/tutor', (req, res) => {
     const ids = req.query.ids
     Tutor.find({
-        "_id":{ "$in" : ids }
+        _id:{ $in : ids }
     })
         .then(data => {
-            console.log(data);
             res.send(data);
         })
         .catch(error => res.status(404).send(error));
