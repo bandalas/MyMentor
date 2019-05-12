@@ -8,6 +8,7 @@ const Tutor = require('./../model/tutor');
 const Class = require('./../model/class');
 const Review = require('./../model/review');
 const Report = require('./../model/report');
+const Booking = require('./../model/booking');
 
 const { classValidation, reportValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
@@ -145,12 +146,39 @@ router.post('/class', auth, (req, res) => {
 router.get('/class', auth, (req, res) => {
     const ids = req.query.ids
     Class.find({
-        "_id":{ "$in" : ids }
+        _id :{ $in : ids }
     })
         .then(data => {
             res.send(data);
         })
         .catch(error => res.status(404).send(error));
+});
+
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*        Fetches all future scheduled classes
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+router.get('/scheduled', auth, (req, res) => {
+    const today = new Date();
+    const tutor  = req.tutor;
+    Booking.find({
+        tutor : tutor._id,
+        status : 'Accepted' 
+    })
+     .then(bookings => {
+         let class_ids = [];
+         bookings.forEach(b => class_ids.push(b.booked_class))
+         Class.find({
+              _id : { $in : class_ids},
+              date : { $gte : today}
+         })
+         .then(data => {
+            res.json(data);
+         })
+         .catch(error => res.status(404).send(error))
+     })
+     .catch( error => res.status(404).send(error));
 });
 
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
@@ -168,6 +196,12 @@ router.put('/cancel-class/:id', auth, (req, res) => {
      .catch(error => res.status(400).send(error.message));
 });
 
+
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Updates class given the class id
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.put('/class/:id', auth, (req, res) => {
     var { error } = classValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
