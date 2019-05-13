@@ -171,7 +171,6 @@ router.put('/accept/:id', auth, (req, res) => {
     }, { new : true })
      .then((updated) => {
          if(!updated) res.send('Wrong id.');
-
          // Rejects other pending bookings.
          Booking.find({
             status: 'Pending',

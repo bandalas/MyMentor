@@ -186,34 +186,46 @@ router.get('/classes',auth, (req, res) => {
      .catch(error => res.status(400).send(error.message));
 });
 
-/*
-*   Fetching all new available classes, sorted by newest
-*/
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*       Fetching all new available 
+*       classes that have not been booked by the student, sorted by newest
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.get('/new-classes', auth, (req, res) => {
-    Class.find({availability: true})
-     .hint({$natural:-1})
-     .then(classes => {
-         res.json(classes)
-     })
+    Booking.find({
+        student: req.student._id
+    },{booked_class: 1, _id: 0})
+     .then(bookings => {
+        const ids = bookings.map(b => b.booked_class);
+        Class.find({
+            availability: true,
+            _id:{ $nin: ids}
+        })
+         .hint({$natural:-1})
+         .then(classes => {
+            res.json(classes)
+         })
+         .catch(error => res.status(400).send(error.message))
+         })
      .catch(error => res.status(400).send(error.message));
 });
 
-/*
-*   Registering a new review
-*/
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*              Registers a new review
+*       
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.post('/new-review/:id', auth, (req, res) =>{
     //Check first the input of the user
-    var { error } = postReview(req.body);
-    if (error) throw new Error(error.details[0].message);
-
     Class.findOne({ _id: req.params.id }).then( tutorClass => {
-      const review = new Review({
+        console.log(tutorClass);
+        const review = new Review({
             student: req.student._id,
             tutor: tutorClass.tutor,
             class: tutorClass._id,
             comment: req.body.comment,
             stars: req.body.stars,
-            date: req.body.date
       });
 
       review.save()
@@ -221,30 +233,122 @@ router.post('/new-review/:id', auth, (req, res) =>{
             console.log(review);
             res.json(review);
         })
-        .catch(error => res.status(400).send(error.message));
+        .catch(error => {
+            console.log(error);
+            res.status(400).send(error.message)
+        });
 
       Tutor.findOne({ _id: tutorClass.tutor })
        .then(async tutor => {
            tutor.stars += review.stars;
            tutor.save()
-            .catch(error => res.status(400).send(error.message));
+            .catch(error => {
+                console.log(error);
+                res.status(400).send(error.message)
+            });
 
            tutorClass.tutor_rating = await tutor.getAverageRating();
            tutorClass.save()
-            .catch(error => res.status(400).send(error.message));
+            .catch(error => {
+                console.log(error);
+                res.status(400).send(error.message)
+            });
        })
     })
-    .catch(error => res.status(400).send(error.message));
+    .catch(error => {
+        console.log(error);
+        res.status(400).send(error.message)
+    });
 });
 
-//          B   O   O   K   I   N   G
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*               Fetches all upcoming classes
+*       
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+router.get('/upcoming', auth, (req, res) => {
+    Booking.find({
+        student: req.student._id,
+        status: 'Accepted'
+    }, {booked_class: 1, _id: 1})
+     .then(bookings => {
+        const ids_class = bookings.map(b => b.booked_class);
+        const ids_booking_class = bookings.map(b => ({ booking: b._id, class: b.booked_class}))
+        Class.find({
+            _id: {$in: ids_class},
+            date: {$gte: new Date()}
+        })
+         .hint({$natural:-1})
+         .then(classes => {
+             let data = []
+             let count = 0;
+             classes.forEach( c => {
+                 let booking = ids_booking_class.find(elem => {return JSON.stringify(elem.class) === JSON.stringify(c._id)});
+                 result = {
+                     _id: booking.booking,
+                     name: c.name,
+                     subject: c.subject,
+                     date: c.date
+                 }
+                 data.push(result);
+                 count++;
+                 if(count === classes.length) res.json(data);
+             })
+             if(classes.length == 0) res.json(data);
+         })
+         .catch(error => res.status(400).send(error.message))
+         })
+     .catch(error => res.status(400).send(error.message));
+});
 
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*               Fetches past classes
+*       
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+router.get('/past', auth, (req, res) => {
+    Booking.find({
+        student: req.student._id,
+        status: 'Accepted'
+    }, {booked_class: 1})
+     .then(bookings => {
+        const ids_class = bookings.map(b => b.booked_class);
+        const ids_booking_class = bookings.map(b => ({ booking: b._id, class: b.booked_class}))
+        Class.find({
+            _id: {$in: ids_class},
+            date: {$lt: new Date()}
+        })
+         .hint({$natural:-1})
+         .then(classes => {
+              let data = []
+              let count = 0;
+              classes.forEach( c => {
+                 let booking = ids_booking_class.find(elem => {return JSON.stringify(elem.class) === JSON.stringify(c._id)});
+                 result = {
+                     _id: booking.booking,
+                     name: c.name,
+                     subject: c.subject,
+                     date: c.date,
+                     class: c._id
+                 }
+                 data.push(result);
+                 count++;
+                 if(count === classes.length) res.json(data);
+             })
+             if(classes.length == 0) res.json(data);
+         })
+         .catch(error => res.status(400).send(error.message))
+         })
+     .catch(error => res.status(400).send(error.message));
+});
 
-/*
-*   Student creates a new class booking
-*/
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*               Bookings
+*       
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+//Student creates a new class booking
 router.post('/book/:id',auth, (req, res) => {
-    console.log('rip');
     console.log(req);
     Class.findById(req.params.id)
      .then(queried_class => {
@@ -270,10 +374,9 @@ router.post('/book/:id',auth, (req, res) => {
     })
 });
 
-/*
-*   Cancels a student class booking
-*/
+//Cancels a student class booking
 router.put('/booking/:id', auth, (req, res) => {
+    console.log()
     Booking.findByIdAndUpdate(req.params.id, {
         status: 'Cancelled'
     }, { new: true })

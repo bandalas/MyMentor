@@ -173,6 +173,7 @@ router.get('/scheduled', auth, (req, res) => {
               _id : { $in : class_ids},
               date : { $gte : today}
          })
+         .sort({ date:1 })
          .then(data => {
             res.json(data);
          })
