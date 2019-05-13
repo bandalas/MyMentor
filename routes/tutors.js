@@ -9,6 +9,7 @@ const Class = require('./../model/class');
 const Review = require('./../model/review');
 const Report = require('./../model/report');
 const Booking = require('./../model/booking');
+const Student = require('./../model/student');
 
 const { classValidation, reportValidation } = require('./../core/validators/tutor-validator');
 const { hashPassword } = require('./../core/password-hasher');
@@ -31,7 +32,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/signup', upload.single('img'),  (req, res) => {
-    
     try {
         hashPassword(req.body.password)
          // We have to hash the password first
@@ -100,8 +100,6 @@ router.get('/classes', auth, (req, res) => {
      .catch(error => res.json(400).send(error.message));
 });
 
-
-
 router.get('/userinfo', auth, (req, res) => {
 Tutor.find({  _id: req.tutor._id})
      .then(userinfo => {
@@ -109,7 +107,6 @@ Tutor.find({  _id: req.tutor._id})
      })
      .catch(error => res.status(400).send(error.message));
 });
-
 
 /*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
 *
@@ -220,12 +217,44 @@ router.put('/class/:id', auth, (req, res) => {
      })
      .catch(error => res.status(400).send(error.message));
 });
-// R E V I E W S 
 
-    router.get('/reviews', auth, (req, res) => {
-    Review.find({ tutor: req.tutor._id   })
+/*  *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *
+*
+*        Fetches reviews
+*
+*   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
+router.get('/reviews', auth, (req, res) => {
+    Review.find({ tutor: req.tutor._id})
      .then(reviews => {
-        res.json(reviews)
+         if(reviews.length === 0) res.json([]);
+         var students = reviews.map(review => { return review.student });
+         var classes = reviews.map(review => { return review.class });
+         Student.find({_id: {$in: students}})
+          .then( students_records => {
+              Class.find({_id : {$in: classes}})
+               .then( class_records => {
+                   stdnt_map = students_records.map(s => ({name: s.firstName+" "+s.lastName, student: s._id}) );
+                   class_map = class_records.map(c => ({name: c.name, class: c._id}));
+                   var data = [];
+                   let size = 0;
+                   reviews.forEach(review => {
+                       var student = stdnt_map.find(elem => { return JSON.stringify(elem.student) === JSON.stringify(review.student)});
+                       var r_class = class_map.find(elem => { return JSON.stringify(elem.class) === JSON.stringify(review.class)});
+                       const response = {
+                            student : student.name,
+                            class : r_class.name,
+                            comment : review.comment,
+                            stars: review.stars,
+                            date: review.date,
+                            _id: review._id
+                       }
+                       data.push(response);
+                       size++;
+                       if(size === reviews.length) res.json(data);
+                   })
+               })
+          })
+
      })
      .catch(error => res.json(400).send(error.message));
 });
