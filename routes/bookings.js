@@ -57,7 +57,6 @@ router.get('/',auth, (req, res) => {
                                 _id: b._id,
                                 status: b.status
                             }
-                            console.log(response)
                             data.push(response);
                             count++;
                             if(count == bookings.length) {
@@ -101,7 +100,6 @@ router.get('/accepted', auth, (req, res) => {
                                 _id: b._id,
                                 status: b.status
                             }
-                            console.log(response)
                             data.push(response);
                             count++;
                             if(count == bookings.length) {
@@ -145,7 +143,6 @@ router.get('/cancelled', auth, (req, res) => {
                                 _id: b._id,
                                 status: b.status
                             }
-                            console.log(response)
                             data.push(response);
                             count++;
                             if(count == bookings.length) {
