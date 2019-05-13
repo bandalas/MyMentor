@@ -75,6 +75,7 @@ router.get('/tutor', (req, res) => {
         _id:{ $in : ids }
     })
         .then(data => {
+            console.log(data);
             res.send(data);
         })
         .catch(error => res.status(404).send(error));
