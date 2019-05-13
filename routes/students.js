@@ -349,7 +349,6 @@ router.get('/past', auth, (req, res) => {
 *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 //Student creates a new class booking
 router.post('/book/:id',auth, (req, res) => {
-    console.log(req);
     Class.findById(req.params.id)
      .then(queried_class => {
          console.log(queried_class)
