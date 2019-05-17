@@ -104,6 +104,7 @@ router.post('/forgot-password', (req, res) => {
                     { upsert: true, new: true }
                 ).then(new_user => {
                     const url_token = 'https://enigmatic-dawn-55919.herokuapp.com/reset_password/reset?token=' + token;
+                    //const url_token = 'http://localhost:3000/reset_password/reset?token=' + token;
                     var data = {
                         to: new_user.email,
                         from: email,
@@ -146,7 +147,7 @@ router.post('/reset_password', (req, res) => {
          if(user) {
              hashPassword(req.body.password)
               .then( hashed => {
-                user.hash_password = hashed;
+                user.password = hashed;
                 user.reset_password_token = undefined;
                 user.reset_password_expires = undefined;
                 user.save()
