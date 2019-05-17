@@ -104,7 +104,6 @@ router.post('/forgot-password', (req, res) => {
                     { upsert: true, new: true }
                 ).then(new_user => {
                     const url_token = 'https://enigmatic-dawn-55919.herokuapp.com/reset_password/reset?token=' + token;
-                    //const url_token = 'http://localhost:3000/reset_password/reset?token=' + token;
                     var data = {
                         to: new_user.email,
                         from: email,
@@ -308,38 +307,45 @@ router.get('/upcoming', auth, (req, res) => {
 *       
 *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   */
 router.get('/past', auth, (req, res) => {
-    Booking.find({
-        student: req.student._id,
-        status: 'Accepted'
-    }, {booked_class: 1})
-     .then(bookings => {
-        const ids_class = bookings.map(b => b.booked_class);
-        const ids_booking_class = bookings.map(b => ({ booking: b._id, class: b.booked_class}))
-        Class.find({
-            _id: {$in: ids_class},
-            date: {$lt: new Date()}
+    Review.find({}, {class:1, _id:0})
+     .then(reviews => {
+         var review_ids = reviews.map(review => JSON.stringify(review.class));
+         Booking.find({
+            student: req.student._id,
+            status: 'Accepted'
+        }, {booked_class: 1})
+            .then(bookings => {
+            const ids_class = bookings.map(b => b.booked_class);
+            const ids_booking_class = bookings.map(b => ({ booking: b._id, class: b.booked_class}))
+            Class.find({
+                _id: {$in: ids_class},
+                date: {$lt: new Date()}
+            })
+                .hint({$natural:-1})
+                .then(classes => {
+                    let data = []
+                    let count = 0;
+                    classes.forEach( c => {
+                        let booking = ids_booking_class.find(elem => {return JSON.stringify(elem.class) === JSON.stringify(c._id)});
+                        const hasReview = review_ids.includes(JSON.stringify(c._id));
+                        result = {
+                            _id: booking.booking,
+                            name: c.name,
+                            subject: c.subject,
+                            date: c.date,
+                            class: c._id,
+                            hasReview: hasReview
+                        }
+                        data.push(result);
+                        count++;
+                        if(count === classes.length) res.json(data);
+                    })
+                    if(classes.length == 0) res.json(data);
+                })
+                .catch(error => res.status(400).send(error.message))
+                })
+            .catch(error => res.status(400).send(error.message));
         })
-         .hint({$natural:-1})
-         .then(classes => {
-              let data = []
-              let count = 0;
-              classes.forEach( c => {
-                 let booking = ids_booking_class.find(elem => {return JSON.stringify(elem.class) === JSON.stringify(c._id)});
-                 result = {
-                     _id: booking.booking,
-                     name: c.name,
-                     subject: c.subject,
-                     date: c.date,
-                     class: c._id
-                 }
-                 data.push(result);
-                 count++;
-                 if(count === classes.length) res.json(data);
-             })
-             if(classes.length == 0) res.json(data);
-         })
-         .catch(error => res.status(400).send(error.message))
-         })
      .catch(error => res.status(400).send(error.message));
 });
 
